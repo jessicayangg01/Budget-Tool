@@ -6,12 +6,17 @@ pandas
 
 matplotlib
 pip install pyqt5
+pip install pyqtgraph
 
 
 use 
 pip install __
 if that doesnt work
 python3 -m pip install ___
+
+# next step / where I left off
+- be able to add more than one graph !!!!!!!!!!!
+- checkout this: https://stackoverflow.com/questions/65789123/how-to-have-two-widgets-in-one-main-window
 
 
 # things I gotta do

@@ -35,6 +35,7 @@ class ApplicationWindow(QMainWindow):
         # self.grid = QGridLayout()
         # self.grid.setRowStretch(0, 1)
         # self.grid.setRowStretch(1, 2)
+
         
 
         # # this is the box from 1-10
