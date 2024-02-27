@@ -23,3 +23,6 @@ class dataAnalysis(object):
 
     def randomForest(self):
         return
+    
+    def linearRegression(self):
+        return
