@@ -1,6 +1,5 @@
 
 # add the plots
-import sys
 import matplotlib
 matplotlib.use("Qt5Agg")
 import numpy as np
@@ -11,9 +10,10 @@ from PyQt5.QtWidgets import QSizePolicy
 class Canvas(FigureCanvas):
     def __init__(self, parent=None, width=10, height=7, dpi=200):
         fig = Figure(figsize=(width, height), dpi=dpi)
-        self.axes = fig.add_subplot(111)
         FigureCanvas.__init__(self, fig)
         self.setParent(parent)
+        # axes
+        self.axes = fig.add_subplot(111) # 111 is the number of axes
         self.axes.plot()
         FigureCanvas.setSizePolicy(self,
                 QSizePolicy.Expanding,
@@ -22,9 +22,13 @@ class Canvas(FigureCanvas):
 
 class StaticCanvas(Canvas):
     """Simple canvas with a sine plot."""
-    def update_figure(self, f):
+    def update_figure(self, f): # change the input
         self.axes.cla()
-        t = np.arange(0.0, 3.0, 0.01)
-        s = np.sin(f*np.pi*t)
-        self.axes.plot(t, s)
+        # t = np.arange(0.2, 3.0, 0.01)
+        # s = np.sin(f*np.pi*t)
+        x = [1,2,3,4]
+        y = [1,2,3,4]
+        self.axes.plot(x, y)
         self.draw()
+
+
