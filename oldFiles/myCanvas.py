@@ -22,12 +22,11 @@ class Canvas(FigureCanvas):
 
 class StaticCanvas(Canvas):
     """Simple canvas with a sine plot."""
-    def update_figure(self, f): # change the input
+    def update_figure(self, x, y): # change the input
         self.axes.cla()
         # t = np.arange(0.2, 3.0, 0.01)
         # s = np.sin(f*np.pi*t)
-        x = [1,2,3,4]
-        y = [1,2,3,4]
+
         self.axes.plot(x, y)
         self.draw()
 

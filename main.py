@@ -11,16 +11,15 @@ readBudget = budgetReader(assets.get_dataFile("DummyData"))
 readBudget.dataClean()
 
 
-
-# analyzeBudget = dataAnalysis(readBudget)
-# analyzeBudget.plot()
-import sys
-from PyQt5.QtWidgets import QApplication 
-from interface.applicationWindow import ApplicationWindow
+analyzeBudget = dataAnalysis(readBudget)
+analyzeBudget.plot()
 
 
-app = QApplication(sys.argv)
-win = ApplicationWindow()
-win.setWindowTitle("Jessica's Thesis")
-win.show()
-sys.exit(app.exec_())
+from interface.graphsView import GraphsView
+
+
+window = GraphsView()
+
+graph = [1,2,3]
+# window.showGraph(graph, 221, "hi")
+# window.showGraph([2,2,2], 222, "bye")
