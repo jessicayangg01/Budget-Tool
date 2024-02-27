@@ -20,15 +20,19 @@ class dataAnalysis(object):
         for i in self.budgetReader.getCol():
             print(i)
 
-        
-        
         plt.scatter(
             x = self.budgetReader.dataDict["TV"],
             y = self.budgetReader.dataDict["Sales"],
-            s = self.budgetReader.dataDict["Radio"],
-            c = self.budgetReader.dataDict["Social Media"]
             )
         plt.show()
+        
+        # plt.scatter(
+        #     x = self.budgetReader.dataDict["TV"],
+        #     y = self.budgetReader.dataDict["Sales"],
+        #     s = self.budgetReader.dataDict["Radio"],
+        #     c = self.budgetReader.dataDict["Social Media"]
+        #     )
+        # plt.show()
     
 
     def randomForest(self):
