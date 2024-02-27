@@ -20,6 +20,8 @@ class dataAnalysis(object):
         for i in self.budgetReader.getCol():
             print(i)
 
+        
+        
         plt.scatter(
             x = self.budgetReader.dataDict["TV"],
             y = self.budgetReader.dataDict["Sales"],

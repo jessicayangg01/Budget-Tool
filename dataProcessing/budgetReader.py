@@ -5,14 +5,27 @@ class budgetReader(object):
         self.data = pd.read_csv(fileName)
         print(self.data)
         self.dataDict = self.data.to_dict("list")
-        print("----------------------------")
+        print("Data loaded successfully.")
     
     def getCol(self):
         return self.data.columns
+
+    def numRows(self):
+        return len(self.data)
     
     def dataClean(self):
         print("________________________________________________________ ")
         print("Data cleaning ... ")
+        
+        print(" ")
+        print("Taking out None Data")
+        old = self.numRows()
+        self.data.dropna(subset=self.getCol(), inplace=True)
+        print("Removed ", old - self.numRows(), " rows of None Data.")
+        self.dataDict = self.data.to_dict("list")
+
+        print(" ")
+        print("Assigning numeric values to string variables")
         for col in self.dataDict:
             if not isinstance(self.dataDict[col][0], float):
                 print(col, " is a ", type(self.dataDict[col][0]), ". Data cleaning will assign integer values to each variable.")
@@ -28,8 +41,8 @@ class budgetReader(object):
                 for val in range(len(self.dataDict[col])):
                     self.dataDict[col][val] = changeVar[self.dataDict[col][val]]
         
-        # for i in self.dataDict:
-        #     print(i)
-        #     print(self.dataDict[i][0])
         print("Data finished cleaning.")
 
+
+    def delCol(self, colName):
+        del self.dataDict[colName]
