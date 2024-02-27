@@ -21,6 +21,7 @@ class dataAnalysis(object):
             print(i)
 
         
+        
         plt.scatter(
             x = self.budgetReader.dataDict["TV"],
             y = self.budgetReader.dataDict["Sales"],

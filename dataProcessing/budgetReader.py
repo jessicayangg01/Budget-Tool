@@ -5,7 +5,7 @@ class budgetReader(object):
         self.data = pd.read_csv(fileName)
         print(self.data)
         self.dataDict = self.data.to_dict("list")
-        print("----------------------------")
+        print("Data loaded successfully.")
     
     def getCol(self):
         return self.data.columns

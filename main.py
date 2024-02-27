@@ -1,8 +1,13 @@
-from budgetReader import budgetReader
-from dataAnalysis import dataAnalysis
+from dataProcessing.budgetReader import budgetReader
+from dataProcessing.dataAnalysis import dataAnalysis
+import assets
 
 
-readBudget = budgetReader("DummyData.csv")
+assets.load_dataFiles()
+
+
+# maybe add a way you can add multiple files
+readBudget = budgetReader(assets.get_dataFile("DummyData"))
 readBudget.dataClean()
 
 
@@ -12,8 +17,6 @@ readBudget.dataClean()
 
 
 # add the plots
-
-
 import sys
 import matplotlib
 matplotlib.use("Qt5Agg")
