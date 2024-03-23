@@ -24,7 +24,7 @@ class GraphsView(object):
         plt.show()
 
 
-    def showGraph(self, graph, subplot, title, type):
+    def showGraph(self, graph, subplot, title, type, line):
         plt.subplot(subplot)
         print("here")
         # plot = plt.subplot2grid(location1, location2, rowspan= rowSpan, colspan=colSpan) 
@@ -37,10 +37,6 @@ class GraphsView(object):
         # plt.xlabel(title) 
         plt.title(title)
         plt.draw()
-
-
-    # def showWindow(self):
-        # plt.show()
  
 
     
@@ -54,7 +50,8 @@ class GraphsView(object):
         readBudget.dataClean()
 
 
-        analyzeBudget = dataAnalysis(readBudget)
+        
+        # analyzeBudget.randomForest()
         self.plot(readBudget)
        
 
@@ -65,9 +62,11 @@ class GraphsView(object):
 
     def plot(self, readBudget):
         n=1
+        analyzeBudget = dataAnalysis(readBudget)
         for col in readBudget.getCol():
-            self.showGraph([ readBudget.dataDict["Sales"], readBudget.dataDict[col]], 330+n, col, "scatter")
+            line = [readBudget.data["Radio"], analyzeBudget.linearRegression("Radio")]
+            self.showGraph([readBudget.data["Sales"], readBudget.data[col]], 330+n, col, "scatter", line)
             n+=1
 
 
-
+#  https://www.youtube.com/watch?v=uKk7Fd3_pf8&ab_channel=JieJenn
