@@ -1,7 +1,8 @@
 
 from interface.graphsView import GraphsView
+from dataProcessing.budgetReader import budgetReader
 
 
-window = GraphsView()
 
-
+graphView = GraphsView()
+file = budgetReader("./assets/DummyData.csv")

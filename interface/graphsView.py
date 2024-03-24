@@ -1,50 +1,109 @@
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Button
 from matplotlib.artist import Artist
-
+import numpy as np
 
 # other classes
 from dataProcessing.budgetReader import budgetReader
 from dataProcessing.dataAnalysis import dataAnalysis
 import assets
 
+# file
+import tkinter
+from tkinter import filedialog
+
 class GraphsView(object):
     def __init__(self):
-        axcut = plt.axes([0.9, 0.0, 0.1, 0.075])
-        self.button1 = Button(axcut, 'YES', color='red', hovercolor='green')
-        self.button1.on_clicked(self._yes)
+        axcut = plt.axes([0.8, 0.0, 0.2, 0.075])
+        self.button1 = Button(axcut, 'Linear Regression', color='white', hovercolor='green')
+        self.button1.on_clicked(self.calculate)
+
+        axcut = plt.axes([0.70, 0.0, 0.12, 0.075])
+        self.button2 = Button(axcut, 'Open File', color='white', hovercolor='green')
+        self.button2.on_clicked(self.openFile)
+
+        # axcut = plt.axes([0.65, 0.0, 0.12, 0.075])
+        # self.button2 = Button(axcut, 'Predict', color='white', hovercolor='green')
+        # self.button2.on_clicked(self.openFile)
         
-        # adding text
-        text  = plt.text(-5, 0.5, "jessicas text", fontsize = 12)
-        text.set_visible(False)
-        Artist.set_visible(text, True)
-        # Artist.remove(text)
+        # # adding text
+        # text  = plt.text(-5, 0.5, "jessicas text", fontsize = 12)
+        # text.set_visible(False)
+        # Artist.set_visible(text, True)
+        # # Artist.remove(text)
+        self.addText("hi there")
 
 
         plt.show()
 
+    def addText(self, text_message):
+        # adding text
+        text  = plt.text(-5, 0.5, text_message, fontsize = 12)
+        text.set_visible(False)
+        Artist.set_visible(text, True)
+        # Artist.remove(text)
+        plt.draw()
 
-    def showGraph(self, graph, subplot, title, type):
+
+
+    def showGraph(self, graph, subplot, title, type, line):
         plt.subplot(subplot)
-        print("here")
-        # plot = plt.subplot2grid(location1, location2, rowspan= rowSpan, colspan=colSpan) 
-        # plt.scatter(graph) 
         if type == "scatter":
-            plt.scatter(x =graph[0], y=graph[1])
+            plt.scatter(x =graph[0], y=graph[1], s=1)
         else:
             plt.plot(graph)
         
         # plt.xlabel(title) 
         plt.title(title)
+        
+
+        # plot line
+        axes = plt.gca()
+        x_vals = np.array(axes.get_xlim())
+        y_vals = line["intercept"] + line["slope"] * x_vals
+        plt.plot(x_vals, y_vals, 'r--')
+
+
+        plt.subplots_adjust(left=0.1,
+                    bottom=0.1, 
+                    right=0.9, 
+                    top=0.9, 
+                    wspace=0.2, 
+                    hspace=0.6)
+        
+
         plt.draw()
+        
 
 
-    # def showWindow(self):
-        # plt.show()
- 
-
+        
+        
     
-    def _yes(self, event):
+    def plot(self, readBudget):
+        n=1
+        analyzeBudget = dataAnalysis(readBudget)
+        for col in readBudget.getCol():
+            line = analyzeBudget.linearRegression(col)
+            self.showGraph([readBudget.data["Sales"], readBudget.data[col]], 330+n, col, "scatter", line)
+
+            # new line
+            
+            self.textBox(line)
+            n+=1
+        
+
+    def textBox(self, line):
+        ## show text
+        textstr = ""
+        for i in line:
+            textstr += str(i) + ":" + str(line[i])
+            textstr += "\n"
+
+        # these are matplotlib.patch.Patch properties
+        plt.text(0, 0, textstr, fontsize = 8, bbox = dict(facecolor = 'white', alpha = 0.5))
+
+### BUTTONS -------------------------------------------
+    def calculate(self, event):
         print("button clicked")
         assets.load_dataFiles()
 
@@ -54,20 +113,22 @@ class GraphsView(object):
         readBudget.dataClean()
 
 
-        analyzeBudget = dataAnalysis(readBudget)
+        
+        # analyzeBudget.randomForest()
         self.plot(readBudget)
        
 
         # window = GraphsView()
         # self.showGraph(graph, 221, "hi")
         # self.showGraph([2,2,2], 222, "bye")
-    
+    def openFile(self, event):
+        filepath = filedialog.askopenfilename(initialdir="C:\\Users\\Cakow\\PycharmProjects\\Main",
+                                            title="Open file okay?",
+                                            filetypes= (("text files","*.txt"),
+                                            ("all files","*.*")))
+        file = open(filepath,'r')
+        print(file.read())
+        file.close()
 
-    def plot(self, readBudget):
-        n=1
-        for col in readBudget.getCol():
-            self.showGraph([ readBudget.dataDict["Sales"], readBudget.dataDict[col]], 330+n, col, "scatter")
-            n+=1
-
-
-
+        self.addText("added file "+ filepath)
+        
