@@ -18,13 +18,13 @@ class GraphsView(object):
         self.button1 = Button(axcut, 'Linear Regression', color='white', hovercolor='green')
         self.button1.on_clicked(self.calculate)
 
-        axcut = plt.axes([0.70, 0.0, 0.12, 0.075])
+        axcut = plt.axes([0.67, 0.0, 0.12, 0.075])
         self.button2 = Button(axcut, 'Open File', color='white', hovercolor='green')
         self.button2.on_clicked(self.openFile)
 
-        # axcut = plt.axes([0.65, 0.0, 0.12, 0.075])
-        # self.button2 = Button(axcut, 'Predict', color='white', hovercolor='green')
-        # self.button2.on_clicked(self.openFile)
+        axcut = plt.axes([0.55, 0.0, 0.12, 0.075])
+        self.button2 = Button(axcut, 'Predict', color='white', hovercolor='green')
+        self.button2.on_clicked(self.predict)
         
         # # adding text
         # text  = plt.text(-5, 0.5, "jessicas text", fontsize = 12)
@@ -32,6 +32,8 @@ class GraphsView(object):
         # Artist.set_visible(text, True)
         # # Artist.remove(text)
         self.addText("hi there")
+
+        self.dataanalyze = None
 
 
         plt.show()
@@ -109,6 +111,7 @@ class GraphsView(object):
 
 
         # maybe add a way you can add multiple files
+        
         readBudget = budgetReader(assets.get_dataFile("DummyData"))
         readBudget.dataClean()
 
@@ -116,6 +119,7 @@ class GraphsView(object):
         
         # analyzeBudget.randomForest()
         self.plot(readBudget)
+        self.dataanalyze = readBudget
        
 
         # window = GraphsView()
@@ -131,4 +135,8 @@ class GraphsView(object):
         file.close()
 
         self.addText("added file "+ filepath)
-        
+    
+
+    def predict(self, event):
+        analyzeBudget = dataAnalysis(self.dataanalyze)
+        analyzeBudget.predict()
