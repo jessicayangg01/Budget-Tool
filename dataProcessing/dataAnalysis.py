@@ -53,11 +53,11 @@ class dataAnalysis(object):
     #     return
     
     def linearRegression(self, col):
-        X = np.array(self.budgetReader.data["Sales"]).reshape((-1, 1))
+        Y = np.array(self.budgetReader.data["Sales"])
         # .reshape((1, -1))      
 
         # predictor
-        Y = np.array(self.budgetReader.data[col])
+        X = np.array(self.budgetReader.data[col]).reshape((-1, 1))
         # slope, intercept, r, p, std_err = stats.linregress(X, Y)
 
         # values = {}
@@ -70,7 +70,10 @@ class dataAnalysis(object):
         # return values
 
         model = LinearRegression().fit(X, Y)
-        r_sq = model.score(X, Y)
+        values = {}
+        values["slope"] = model.coef_[0]
+        values["intercept"] = model.intercept_
+        values["r squared"] = model.score(X, Y)
 
 
         # X2 = sm.add_constant(X)
@@ -80,24 +83,27 @@ class dataAnalysis(object):
         
         
 
-        values = {}
-        values["slope"] = model.coef_[0]
-        values["intercept"] = model.intercept_
-        values["r squared"] = r_sq
-
         return values
 
-    def predict(self):
+    def predict(self, predict_data):
         print("predict")
-        
-        self.accuracy(100)
+        X = self.budgetReader.data[[i for i in self.budgetReader.data if i!="Sales"]]
+        Y = self.budgetReader.data["Sales"]
+        print(X)
+        model = LinearRegression().fit(X, Y)
+
+        predicted_values = model.predict(predict_data)
+        print(predicted_values)
+        self.accuracy(0.2)
 
         return
     
     def accuracy(self, percent):
         Y = self.budgetReader.data["Sales"]
         X = self.budgetReader.data[[i for i in self.budgetReader.data if i!="Sales"]]
-        x_train, x_test,y_train,y_test = train_test_split(X,Y,test_size =0.2)
+        x_train, x_test,y_train,y_test = train_test_split(X,Y,test_size =percent)
+
+        print(x_test)
 
         model = LinearRegression().fit(x_train, y_train)
         y_pred_test = model.predict(x_test)

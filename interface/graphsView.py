@@ -51,7 +51,7 @@ class GraphsView(object):
     def showGraph(self, graph, subplot, title, type, line):
         plt.subplot(subplot)
         if type == "scatter":
-            plt.scatter(x =graph[0], y=graph[1], s=1)
+            plt.scatter(x =graph[1], y=graph[0], s=1)
         else:
             plt.plot(graph)
         
@@ -85,7 +85,11 @@ class GraphsView(object):
         n=1
         analyzeBudget = dataAnalysis(readBudget)
         for col in readBudget.getCol():
-            line = analyzeBudget.linearRegression(col)
+            line  = analyzeBudget.linearRegression(col)
+            # values = {}
+            # values["slope"] = model.coef_[0]
+            # values["intercept"] = model.intercept_
+            # # values["r squared"] = model.score(X, Y)
             self.showGraph([readBudget.data["Sales"], readBudget.data[col]], 330+n, col, "scatter", line)
 
             # new line
@@ -139,4 +143,4 @@ class GraphsView(object):
 
     def predict(self, event):
         analyzeBudget = dataAnalysis(self.dataanalyze)
-        analyzeBudget.predict()
+        analyzeBudget.predict([[1, 16,6.566230788,2.907982773,1]])
