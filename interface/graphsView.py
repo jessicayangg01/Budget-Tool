@@ -9,7 +9,6 @@ from dataProcessing.dataAnalysis import dataAnalysis
 import assets
 
 # file
-import tkinter
 from tkinter import filedialog
 
 class GraphsView(object):
@@ -18,13 +17,13 @@ class GraphsView(object):
         self.button1 = Button(axcut, 'Linear Regression', color='white', hovercolor='green')
         self.button1.on_clicked(self.calculate)
 
-        axcut = plt.axes([0.70, 0.0, 0.12, 0.075])
+        axcut = plt.axes([0.67, 0.0, 0.12, 0.075])
         self.button2 = Button(axcut, 'Open File', color='white', hovercolor='green')
         self.button2.on_clicked(self.openFile)
 
-        # axcut = plt.axes([0.65, 0.0, 0.12, 0.075])
-        # self.button2 = Button(axcut, 'Predict', color='white', hovercolor='green')
-        # self.button2.on_clicked(self.openFile)
+        axcut = plt.axes([0.55, 0.0, 0.12, 0.075])
+        self.button2 = Button(axcut, 'Predict', color='white', hovercolor='green')
+        self.button2.on_clicked(self.predict)
         
         # # adding text
         # text  = plt.text(-5, 0.5, "jessicas text", fontsize = 12)
@@ -32,6 +31,8 @@ class GraphsView(object):
         # Artist.set_visible(text, True)
         # # Artist.remove(text)
         self.addText("hi there")
+
+        self.dataanalyze = None
 
 
         plt.show()
@@ -49,7 +50,7 @@ class GraphsView(object):
     def showGraph(self, graph, subplot, title, type, line):
         plt.subplot(subplot)
         if type == "scatter":
-            plt.scatter(x =graph[0], y=graph[1], s=1)
+            plt.scatter(x =graph[1], y=graph[0], s=1)
         else:
             plt.plot(graph)
         
@@ -83,7 +84,11 @@ class GraphsView(object):
         n=1
         analyzeBudget = dataAnalysis(readBudget)
         for col in readBudget.getCol():
-            line = analyzeBudget.linearRegression(col)
+            line  = analyzeBudget.linearRegression(col)
+            # values = {}
+            # values["slope"] = model.coef_[0]
+            # values["intercept"] = model.intercept_
+            # # values["r squared"] = model.score(X, Y)
             self.showGraph([readBudget.data["Sales"], readBudget.data[col]], 330+n, col, "scatter", line)
 
             # new line
@@ -109,6 +114,7 @@ class GraphsView(object):
 
 
         # maybe add a way you can add multiple files
+        
         readBudget = budgetReader(assets.get_dataFile("DummyData"))
         readBudget.dataClean()
 
@@ -116,6 +122,7 @@ class GraphsView(object):
         
         # analyzeBudget.randomForest()
         self.plot(readBudget)
+        self.dataanalyze = readBudget
        
 
         # window = GraphsView()
@@ -131,4 +138,8 @@ class GraphsView(object):
         file.close()
 
         self.addText("added file "+ filepath)
-        
+    
+
+    def predict(self, event):
+        analyzeBudget = dataAnalysis(self.dataanalyze)
+        analyzeBudget.predict([[1, 16,6.566230788,2.907982773,1]])
