@@ -9,7 +9,6 @@ from dataProcessing.dataAnalysis import dataAnalysis
 import assets
 
 # file
-import tkinter
 from tkinter import filedialog
 
 class GraphsView(object):

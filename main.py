@@ -6,3 +6,4 @@ from dataProcessing.budgetReader import budgetReader
 
 graphView = GraphsView()
 file = budgetReader("./assets/DummyData.csv")
+graphView.plot()

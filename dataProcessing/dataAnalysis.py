@@ -12,45 +12,6 @@ class dataAnalysis(object):
     def __init__(self, budgetReader):
         self.budgetReader = budgetReader
 
-    # def plot(self):
-    #     for i in self.budgetReader.getCol():
-    #         print(i)
-
-    #     # plt.scatter(
-    #     #     x = self.budgetReader.dataDict["TV"],
-    #     #     y = self.budgetReader.dataDict["Sales"],
-    #     #     )
-        
-
-
-    #     # window.showWindow()
-            
-        
-    
-
-    # def randomForest(self):
-
-    #     # exclude
-    #     # exclude_keys = ['Sales']
-    #     # X = [value for key, value in self.budgetReader.dataDict.items() if key not in exclude_keys]
-
-    #     # Split the data into features (X) and target (y)
-    #     X = self.budgetReader.data.drop('Sales', axis=1).reshape(-1, 1)
-    #     Y = self.budgetReader.data["Sales"]
-
-    #     # Split the data into training and test sets
-
-    #     X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.2)
-
-    #     rf = RandomForestClassifier()
-    #     rf.fit(X_train, y_train)
-    #     y_pred = rf.predict(X_test)
-    #     accuracy = accuracy_score(y_test, y_pred)
-    #     print("Accuracy:", accuracy)  
-    #     #https://www.statology.org/valueerror-unknown-label-type-continuous/
-    #     # Note that this doesnt work because Sales value is continuous  
-
-    #     return
     
     def linearRegression(self, col):
         Y = np.array(self.budgetReader.data["Sales"])
@@ -116,3 +77,6 @@ class dataAnalysis(object):
         print("R2 score =", round(sm.r2_score(y_test, y_pred_test), 2))
         
         return
+    
+
+    # maybe add how to economy is doing with the marketing budget? with stock api?
