@@ -1,18 +1,7 @@
 Downloads
 
-tkinter
-scipy
-pandas
+pip install -r requirements.txt 
 
-matplotlib
-pip install pyqt5
-pip install pyqtgraph
-
-
-use 
-pip install __
-if that doesnt work
-python3 -m pip install ___
 
 # next step / where I left off
 - do random forest and linear regression 
