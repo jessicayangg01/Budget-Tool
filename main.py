@@ -1,9 +1,6 @@
-
-from interface.graphsView import GraphsView
-from dataProcessing.budgetReader import budgetReader
-
+import tkinter as tk
+from interface.ui import SimpleApp
 
 
-graphView = GraphsView()
-file = budgetReader("./assets/DummyData.csv")
-graphView.plot()
+
+graphView = SimpleApp()
