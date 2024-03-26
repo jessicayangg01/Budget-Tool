@@ -1,11 +1,12 @@
 import pandas as pd
 
 class budgetReader(object):
-    def __init__(self, fileName):
+    def __init__(self, fileName, data_logger):
         self.data = pd.read_csv(fileName)
-        print(self.data)
-        # self.dataDict = self.data.to_dict("list")
-        print("Data loaded successfully.")
+        self.filename = fileName
+        
+        self.data_logger = data_logger
+        self.data_logger.addtext("Data loaded successfully.")
     
     def getCol(self):
         return self.data.columns
@@ -14,49 +15,42 @@ class budgetReader(object):
         return len(self.data)
     
     def dataClean(self):
-        print("________________________________________________________ ")
-        print("Data cleaning ... ")
+        self.data_logger.addtext("________________________________________________________ ")
+        self.data_logger.addtext("Data cleaning for " + self.filename + "... ")
         
-        print(" ")
-        print("Taking out None Data")
+        self.data_logger.addtext(" ")
+        self.data_logger.addtext("Taking out None Data")
         old = self.numRows()
         self.data.dropna(subset=self.getCol(), inplace=True)
-        print("Removed ", old - self.numRows(), " rows of None Data.")
-        print(self.data)
+        self.data_logger.addtext("Removed " + str(old - self.numRows()) + " rows of None Data.")
+        
         # self.dataDict = self.data.to_dict("list")
 
-        print(" ")
-        print("Assigning numeric values to string variables")
-        # for col in self.dataDict:
-        #     if not isinstance(self.dataDict[col][0], float):
-        #         print(col, " is a ", type(self.dataDict[col][0]), ". Data cleaning will assign integer values to each variable.")
-        #         variables = set(self.dataDict[col])
-        #         changeVar = {}
+        self.data_logger.addtext(" ")
+        self.data_logger.addtext("Assigning numeric values to string variables")
 
-        #         for index, var in enumerate(variables, 1):
-        #             changeVar[var] = index
-        #             print(var, " will be assigned to the numeric value of : ", index)
-
-        #         # self.dataDict[col] = self.dataDict[col].map(changeVar)
-        #         # self.dataDict = self.dataDict.map(changeVar)
-        #         for val in range(len(self.dataDict[col])):
-        #             self.dataDict[col][val] = changeVar[self.dataDict[col][val]]
 
         for col in self.data:
             if not isinstance(self.data[col][0], float):
-                print(col, " is a ", type(self.data[col][0]), ". Data cleaning will assign integer values to each variable.")
+                self.data_logger.addtext(str(col)  +  " is a " +  str(type(self.data[col][0])) +  ". Data cleaning will assign integer values to each variable.")
                 variables = set(self.data[col])
                 changeVar = {}
 
                 for index, var in enumerate(variables, 1):
                     changeVar[var] = index
-                    print(var, " will be assigned to the numeric value of : ", index)
+                    self.data_logger.addtext(str(var) + " will be assigned to the numeric value of : " +  str(index))
 
                 self.data = self.data.reset_index()
                 for val in range(len(self.data[col])):
                     self.data.loc[val, col] = changeVar[self.data[col][val]]
         
-        print("Data finished cleaning.")
+        self.data_logger.addtext(" ")
+        self.data_logger.addtext("Data preview:")
+        self.data_logger.addtext(str(self.data))
+
+        self.data_logger.addtext(" ")
+        self.data_logger.addtext("Data finished cleaning.")
+        self.data_logger.addtext("________________________________________________________ ")
 
 
     def delCol(self, colName):

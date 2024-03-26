@@ -9,10 +9,10 @@ from dataProcessing.budgetReader import budgetReader
 
 
 import tkinter as tk
-from interface.textView import textView
+from interface.textView import mainWindow
 ## tinker stuff
 win=tk.Tk()
-newText = textView(win)
-newText.addText_left("Successfully started program.")
+newText = mainWindow(win)
+newText.event_logger.addtext("Successfully started program.")
 win.mainloop()
 

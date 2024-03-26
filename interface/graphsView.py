@@ -19,8 +19,9 @@ from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,  NavigationToo
 
 
 class GraphsView(object):
-    def __init__(self, window):
-        
+    def __init__(self, window, data_logger, event_logger):
+        self.data_logger = data_logger
+        self.event_logger = event_logger
         self.fig = Figure(figsize = (5, 5), dpi = 100) 
         
         # creating the Tkinter canvas 
@@ -41,7 +42,6 @@ class GraphsView(object):
         self.canvas.get_tk_widget().config(borderwidth=2, relief="solid")
         self.fig.suptitle("Graphs View", fontsize=12)
 
-
         # Create three Tkinter buttons
         button1 = Button(self.canvas.get_tk_widget(), text="Calculate")
         button2 = Button(self.canvas.get_tk_widget(), text="Open File")
@@ -60,20 +60,13 @@ class GraphsView(object):
         button3.bind("<Button-1>", self.predict)
 
 
+        ### this is for the file 
+        self.file = None
+
+
 
     def remove(self):
         self.canvas.get_tk_widget().destroy()
-
-
-    def addText(self, text_message):
-        # adding text
-        # text  = plt.text(-5, 0.5, text_message, fontsize = 12)
-        # text.set_visible(False)
-        # Artist.set_visible(text, True)
-        # # Artist.remove(text)
-        # plt.draw()
-        print("YES ADD TEXT")
-
 
 
     def showGraph(self, graph, subplot, title, type, line):
@@ -108,12 +101,10 @@ class GraphsView(object):
         
 
 
-        
-        
     
     def plot(self, readBudget):
         n=1
-        analyzeBudget = dataAnalysis(readBudget)
+        analyzeBudget = dataAnalysis(readBudget, self.data_logger)
         for col in readBudget.getCol():
             line  = analyzeBudget.linearRegression(col)
             # values = {}
@@ -125,53 +116,69 @@ class GraphsView(object):
             # new line
             
             self.textBox(line)
+
             n+=1
         
 
     def textBox(self, line):
-        ## show text
-        # textstr = ""
-        # for i in line:
-        #     textstr += str(i) + ":" + str(line[i])
-        #     textstr += "\n"
+        # show text
+        textstr = ""
+        for i in line:
+            textstr += str(i) + ":" + str(line[i])
+            textstr += "\n"
 
-        # # these are matplotlib.patch.Patch properties
-        # plt.text(0, 0, textstr, fontsize = 8, bbox = dict(facecolor = 'white', alpha = 0.5))
+        # these are matplotlib.patch.Patch properties
+        self.currPlot.text(0, 0, textstr, fontsize = 8, bbox = dict(facecolor = 'white', alpha = 0.5))
         print("YES ADD TEXT 3")
 
-### BUTTONS -------------------------------------------
-    def calculate(self, event):
-        print("button clicked")
-        assets.load_dataFiles()
 
+### BUTTONS -------------------------------------------
+    # def calculate(self, event):
+        
+        
+    #     print("button clicked")
+    #     assets.load_dataFiles()
+
+    #     # maybe add a way you can add multiple files
+    #     readBudget = budgetReader(assets.get_dataFile("DummyData"))
+    #     readBudget.dataClean()
+        
+    #     # analyzeBudget.randomForest()
+    #     self.plot(readBudget)
+    #     self.dataanalyze = readBudget
+        
+
+    def calculate(self, event): 
+
+        if not self.file:
+            self.event_logger.addtext("no file to read from")
+            return
+        
+        self.event_logger.addtext("Calculating for "+ self.file)
 
         # maybe add a way you can add multiple files
-        
-        readBudget = budgetReader(assets.get_dataFile("DummyData"))
+        readBudget = budgetReader(self.file, self.data_logger)
         readBudget.dataClean()
-
-
         
         # analyzeBudget.randomForest()
         self.plot(readBudget)
         self.dataanalyze = readBudget
        
 
-        # window = GraphsView()
-        # self.showGraph(graph, 221, "hi")
-        # self.showGraph([2,2,2], 222, "bye")
     def openFile(self, event):
         filepath = filedialog.askopenfilename(initialdir="C:\\Users\\Cakow\\PycharmProjects\\Main",
                                             title="Open file okay?",
                                             filetypes= (("text files","*.txt"),
                                             ("all files","*.*")))
         file = open(filepath,'r')
-        print(file.read())
+        self.file = filepath
+        # print(file.read())
         file.close()
-
-        self.addText("added file "+ filepath)
+        self.event_logger.addtext("added file "+ filepath)
+        
     
 
     def predict(self, event):
-        analyzeBudget = dataAnalysis(self.dataanalyze)
+        self.event_logger.addtext("predictions incoming ...")
+        analyzeBudget = dataAnalysis(self.dataanalyze, self.data_logger)
         analyzeBudget.predict([[1, 16,6.566230788,2.907982773,1]])
