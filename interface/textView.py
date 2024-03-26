@@ -9,63 +9,54 @@ from interface.graphsView import GraphsView
 from dataProcessing.budgetReader import budgetReader
 
 
-class textView(object):
+# loggers
+from interface.eventLogger import EventLogger
+from interface.dataLogger import DataLogger
+
+
+class mainWindow(object):
     def __init__(self, win):
         self.win = win
         self.win.state('zoomed')          
-        height = self.win.winfo_screenheight()               
-        # self.win.geometry("1000x850")
         self.win.title("Jessica Plot")
+        
+        # Create a frame to contain the loggers
+        loggers_frame = Frame(win)
+        loggers_frame.pack(fill="x")  # Pack horizontally
 
-        # Create a frame to contain the text boxes and graphs
-        content_frame = Frame(self.win)
-        content_frame.pack(fill=BOTH, expand=True)
+        # Create and pack the EventLogger frame
+        self.event_logger = EventLogger(loggers_frame)
+        self.event_logger.pack(side="left", fill="both", expand=True)
 
-        text_height = height // 3
-        # Add a Scrollbar(horizontal)
-        v = Scrollbar(content_frame, orient='vertical')
-        v.pack(side=RIGHT, fill='y')
+        # Create and pack the DataLogger frame
+        self.data_logger = DataLogger(loggers_frame)
+        self.data_logger.pack(side="left", fill="both", expand=True)
 
-        # Add a text widget on the top-left side
-        self.text_left = Text(content_frame, font=("Georgia, 10"), yscrollcommand=v.set)
 
-        # Add some text in the text widget
-        for i in range(20):
-            self.text_left.insert(END, "Welcome to Tutorialspoint...\n\n")
-
-        # Attach the scrollbar with the text widget
-        v.config(command=self.text_left.yview)
-        self.text_left.pack(side=LEFT, padx=(0, 5), pady=(0, 5), fill=BOTH, expand=True)
-
-        # Add another text widget on the top-right side
-        self.text_right = Text(content_frame, font=("Georgia, 10"), yscrollcommand=v.set)
-
-        # Add some text in the text widget
-        for i in range(20):
-            self.text_right.insert(END, "Additional text...\n\n")
-
-        # Attach the scrollbar with the text widget
-        v.config(command=self.text_right.yview)
-        self.text_right.pack(side=LEFT, padx=(5, 0), pady=(0, 5), fill=BOTH, expand=True)
+    
 
         # Create a plot button
         self.plot_button = Button(master=self.win, 
                                   command=self.plot,
                                   height=2, 
                                   width=10, 
-                                  text="Plot") 
+                                  text="Add New Plot") 
         self.plot_button.pack(side=BOTTOM, pady=10)
 
         # Initialize a list to hold GraphsView instances
         self.graph_views = []
 
     def plot(self):
+        if len(self.graph_views) >=3:
+            self.event_logger.addtext("Error. Too many graphs. Please delete a graph view before adding another.")
+            return
         # Create a new GraphsView instance
-        new_graph_view = GraphsView(self.win)
+        new_graph_view = GraphsView(self.win, self.data_logger, self.event_logger)
         self.graph_views.append(new_graph_view)
 
         # Create a button to remove the canvas
         def remove_canvas():
+            self.graph_views.remove(new_graph_view)
             new_graph_view.remove()
             button_remove.destroy()
 
@@ -74,13 +65,3 @@ class textView(object):
 
         # Pack the new GraphsView instance within the content frame
         new_graph_view.canvas.get_tk_widget().pack(side=LEFT, fill=BOTH, expand=True)
-
-        # new_graph_view.canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=True)
-
-    def addText_main(self, message):
-        self.text_right.insert(END, ""+message)
-        self.text_right.insert(END, "\n")
-    
-    def addText(self, message):
-        self.text_left.insert(END, ""+message)
-        self.text_left.insert(END, "\n")
