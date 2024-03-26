@@ -22,89 +22,74 @@ from dataProcessing.dataAnalysis import dataAnalysis
 import assets
 
 
-## new
 
-from tkinter import * 
-from matplotlib.figure import Figure 
-from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,  
-NavigationToolbar2Tk) 
 
 
 
 class GraphsView(object):
-    def __init__(self, window):
-        
-        self.fig = Figure(figsize = (5, 5), dpi = 100) 
-        
-        # creating the Tkinter canvas 
-        # containing the Matplotlib figure 
-        self.canvas = FigureCanvasTkAgg(self.fig, master = window)   
-        self.canvas.draw() 
-        
-        # placing the canvas on the Tkinter window 
-        self.canvas.get_tk_widget().pack() 
-        
-        # # creating the Matplotlib toolbar 
-        # toolbar = NavigationToolbar2Tk(self.canvas, window) 
-        # toolbar.update() 
-        
-        # # placing the toolbar on the Tkinter window 
-        # self.canvas.get_tk_widget().pack() 
+    def __init__(self):
 
 
-        # Create three Tkinter buttons
-        button1 = Button(self.canvas.get_tk_widget(), text="Calculate")
-        button2 = Button(self.canvas.get_tk_widget(), text="Open File")
-        button3 = Button(self.canvas.get_tk_widget(), text="Predict")
 
-        # Position the buttons at the top of the canvas
-        button1.place(x=50, y=10)
-        button2.place(x=150, y=10)
-        button3.place(x=250, y=10)
 
-        # Bind the buttons to their respective functions
-        button1.bind("<Button-1>", self.calculate)
-        button2.bind("<Button-1>", self.openFile)
-        button3.bind("<Button-1>", self.predict)
+
+
+        axcut = plt.axes([0.8, 0.0, 0.2, 0.075])
+        self.button1 = Button(axcut, 'Linear Regression', color='white', hovercolor='green')
+        self.button1.on_clicked(self.calculate)
+
+        axcut = plt.axes([0.67, 0.0, 0.12, 0.075])
+        self.button2 = Button(axcut, 'Open File', color='white', hovercolor='green')
+        self.button2.on_clicked(self.openFile)
+
+        axcut = plt.axes([0.55, 0.0, 0.12, 0.075])
+        self.button3 = Button(axcut, 'Predict', color='white', hovercolor='green')
+        self.button3.on_clicked(self.predict)
+        
+        # # adding text
+        # text  = plt.text(-5, 0.5, "jessicas text", fontsize = 12)
+        # text.set_visible(False)
+        # Artist.set_visible(text, True)
+        # # Artist.remove(text)
+        self.addText("hi there")
 
         self.dataanalyze = None
 
 
-    def remove(self):
-        self.canvas.get_tk_widget().destroy()
+        plt.show()
 
+
+        
 
     def addText(self, text_message):
         # adding text
-        # text  = plt.text(-5, 0.5, text_message, fontsize = 12)
-        # text.set_visible(False)
-        # Artist.set_visible(text, True)
-        # # Artist.remove(text)
-        # plt.draw()
-        print("YES ADD TEXT")
+        text  = plt.text(-5, 0.5, text_message, fontsize = 12)
+        text.set_visible(False)
+        Artist.set_visible(text, True)
+        # Artist.remove(text)
+        plt.draw()
 
 
 
     def showGraph(self, graph, subplot, title, type, line):
-        self.currPlot = self.fig.add_subplot(subplot)
+        plt.subplot(subplot)
         if type == "scatter":
-            self.currPlot.scatter(x =graph[1], y=graph[0], s=1)
+            plt.scatter(x =graph[1], y=graph[0], s=1)
         else:
-            self.currPlot.plot(graph)
+            plt.plot(graph)
         
         # plt.xlabel(title) 
-        self.currPlot.set_title(title)
-        self.currPlot.set_xlabel('X Label')
-        self.currPlot.set_ylabel('Y Label')
+        plt.title(title)
         
 
         # plot line
-        x_vals = np.array(self.currPlot.get_xlim())
+        axes = plt.gca()
+        x_vals = np.array(axes.get_xlim())
         y_vals = line["intercept"] + line["slope"] * x_vals
-        self.currPlot.plot(x_vals, y_vals, 'r--')
+        plt.plot(x_vals, y_vals, 'r--')
 
 
-        self.fig.subplots_adjust(left=0.1,
+        plt.subplots_adjust(left=0.1,
                     bottom=0.1, 
                     right=0.9, 
                     top=0.9, 
@@ -112,8 +97,7 @@ class GraphsView(object):
                     hspace=0.6)
         
 
-        # self.currPlot.draw()
-        self.canvas.draw() 
+        plt.draw()
         
 
 
@@ -139,14 +123,13 @@ class GraphsView(object):
 
     def textBox(self, line):
         ## show text
-        # textstr = ""
-        # for i in line:
-        #     textstr += str(i) + ":" + str(line[i])
-        #     textstr += "\n"
+        textstr = ""
+        for i in line:
+            textstr += str(i) + ":" + str(line[i])
+            textstr += "\n"
 
-        # # these are matplotlib.patch.Patch properties
-        # plt.text(0, 0, textstr, fontsize = 8, bbox = dict(facecolor = 'white', alpha = 0.5))
-        print("YES ADD TEXT 3")
+        # these are matplotlib.patch.Patch properties
+        plt.text(0, 0, textstr, fontsize = 8, bbox = dict(facecolor = 'white', alpha = 0.5))
 
 ### BUTTONS -------------------------------------------
     def calculate(self, event):
