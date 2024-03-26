@@ -3,55 +3,40 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import RandomizedSearchCV, train_test_split
 from sklearn.metrics import accuracy_score, confusion_matrix, precision_score, recall_score, ConfusionMatrixDisplay
 from scipy import stats
-
+import dataProcessing.datasets as datasets 
 from sklearn.linear_model import LinearRegression
 import numpy as np
 import sklearn.metrics as sm
+import logging
 
 class dataAnalysis(object):
-    def __init__(self, budgetReader):
-        self.budgetReader = budgetReader
+    def __init__(self, data: datasets):
+        self.data = data
 
-    
     def linearRegression(self, col):
         Y = np.array(self.budgetReader.data["Sales"])
-        # .reshape((1, -1))      
-
-        # predictor
         X = np.array(self.budgetReader.data[col]).reshape((-1, 1))
-        # slope, intercept, r, p, std_err = stats.linregress(X, Y)
-
-        # values = {}
-        # values["slope"] = slope
-        # values["intercept"] = intercept
-        # values["r"] = r
-        # values["p"] = p
-        # values["standard error"] = std_err
-        
-        # return values
 
         model = LinearRegression().fit(X, Y)
         values = {}
         values["slope"] = model.coef_[0]
         values["intercept"] = model.intercept_
         values["r squared"] = model.score(X, Y)
-
-
-        # X2 = sm.add_constant(X)
-        # est = sm.OLS(Y, X2)
-        # est2 = est.fit()
-        # print(est2.summary())
         
         
 
         return values
 
-    def predict(self, predict_data):
-        print("predict")
-        X = self.budgetReader.data[[i for i in self.budgetReader.data if i!="Sales"]]
-        Y = self.budgetReader.data["Sales"]
-        print(X)
-        model = LinearRegression().fit(X, Y)
+    def getXForRegression(self, col):
+        return self.data.data[[i for i in self.data.data if i!=col]]
+
+    def getYForRegression(self, col ):
+        return self.data.data[col]
+
+    def Predict(self, predict_data, col):
+        logging.info(f"Predicting {col}")
+        x, y = self.getXForRegression(col), self.getYForRegression(col)
+        model = LinearRegression().fit(x, y)
 
         predicted_values = model.predict(predict_data)
         print(predicted_values)
