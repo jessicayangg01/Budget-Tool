@@ -17,14 +17,17 @@ class textView(object):
         # self.win.geometry("1000x850")
         self.win.title("Jessica Plot")
 
+        # Create a frame to contain the text boxes and graphs
+        content_frame = Frame(self.win)
+        content_frame.pack(fill=BOTH, expand=True)
 
         text_height = height // 3
         # Add a Scrollbar(horizontal)
-        v = Scrollbar(self.win, orient='vertical')
+        v = Scrollbar(content_frame, orient='vertical')
         v.pack(side=RIGHT, fill='y')
 
         # Add a text widget on the top-left side
-        self.text_left = Text(self.win, font=("Georgia, 10"), yscrollcommand=v.set)
+        self.text_left = Text(content_frame, font=("Georgia, 10"), yscrollcommand=v.set)
 
         # Add some text in the text widget
         for i in range(20):
@@ -32,10 +35,10 @@ class textView(object):
 
         # Attach the scrollbar with the text widget
         v.config(command=self.text_left.yview)
-        self.text_left.place(relx=0, rely=0, relwidth=0.5, relheight=text_height/height)
+        self.text_left.pack(side=LEFT, padx=(0, 5), pady=(0, 5), fill=BOTH, expand=True)
 
         # Add another text widget on the top-right side
-        self.text_right = Text(self.win, font=("Georgia, 10"), yscrollcommand=v.set)
+        self.text_right = Text(content_frame, font=("Georgia, 10"), yscrollcommand=v.set)
 
         # Add some text in the text widget
         for i in range(20):
@@ -43,8 +46,7 @@ class textView(object):
 
         # Attach the scrollbar with the text widget
         v.config(command=self.text_right.yview)
-        self.text_right.place(relx=0.5, rely=0, relwidth=0.5, relheight=text_height/height)
-
+        self.text_right.pack(side=LEFT, padx=(5, 0), pady=(0, 5), fill=BOTH, expand=True)
 
         # Create a plot button
         self.plot_button = Button(master=self.win, 
@@ -70,9 +72,10 @@ class textView(object):
         button_remove = Button(self.win, text="Remove Canvas", command=remove_canvas)
         button_remove.place(in_=new_graph_view.canvas.get_tk_widget(), relx=1.0, rely=0.0, anchor=NE)
 
+        # Pack the new GraphsView instance within the content frame
+        new_graph_view.canvas.get_tk_widget().pack(side=LEFT, fill=BOTH, expand=True)
 
-        # Pack the new GraphsView instance to display it horizontally
-        new_graph_view.canvas.get_tk_widget().pack(side=LEFT)
+        # new_graph_view.canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=True)
 
     def addText_main(self, message):
         self.text_right.insert(END, ""+message)

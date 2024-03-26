@@ -34,8 +34,7 @@ NavigationToolbar2Tk)
 class GraphsView(object):
     def __init__(self, window):
         
-        self.fig = Figure(figsize = (5, 5), 
-                        dpi = 100) 
+        self.fig = Figure(figsize = (5, 5), dpi = 100) 
         
         # creating the Tkinter canvas 
         # containing the Matplotlib figure 
