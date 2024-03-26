@@ -13,6 +13,6 @@ from interface.textView import textView
 ## tinker stuff
 win=tk.Tk()
 newText = textView(win)
-newText.addText("what")
+newText.addText_left("Successfully started program.")
 win.mainloop()
 

@@ -4,19 +4,7 @@ from matplotlib.artist import Artist
 import numpy as np
 
 
-# tinker
-# file
 from tkinter import filedialog
-# import tkinter as tk
-# from interface.textView import textView
-#         ## tinker stuff
-#         win=tk.Tk()
-#         newText = textView(win)
-#         newText.addText("what")
-#         # win.mainloop()
-#         # show()
-
-# other classes
 from dataProcessing.budgetReader import budgetReader
 from dataProcessing.dataAnalysis import dataAnalysis
 import assets
@@ -26,8 +14,7 @@ import assets
 
 from tkinter import * 
 from matplotlib.figure import Figure 
-from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,  
-NavigationToolbar2Tk) 
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,  NavigationToolbar2Tk) 
 
 
 
@@ -47,9 +34,12 @@ class GraphsView(object):
         # # creating the Matplotlib toolbar 
         # toolbar = NavigationToolbar2Tk(self.canvas, window) 
         # toolbar.update() 
-        
         # # placing the toolbar on the Tkinter window 
         # self.canvas.get_tk_widget().pack() 
+
+
+        self.canvas.get_tk_widget().config(borderwidth=2, relief="solid")
+        self.fig.suptitle("Graphs View", fontsize=12)
 
 
         # Create three Tkinter buttons
@@ -57,17 +47,18 @@ class GraphsView(object):
         button2 = Button(self.canvas.get_tk_widget(), text="Open File")
         button3 = Button(self.canvas.get_tk_widget(), text="Predict")
 
-        # Position the buttons at the top of the canvas
-        button1.place(x=50, y=10)
-        button2.place(x=150, y=10)
-        button3.place(x=250, y=10)
+        # Position the buttons at the bottom of the canvas
+        window.update_idletasks()
+        canvas_height = self.canvas.get_tk_widget().winfo_height()
+        button1.place(x=50, y=canvas_height-50)
+        button2.place(x=150, y=canvas_height-50)
+        button3.place(x=250, y=canvas_height-50)
 
         # Bind the buttons to their respective functions
         button1.bind("<Button-1>", self.calculate)
         button2.bind("<Button-1>", self.openFile)
         button3.bind("<Button-1>", self.predict)
 
-        self.dataanalyze = None
 
 
     def remove(self):
