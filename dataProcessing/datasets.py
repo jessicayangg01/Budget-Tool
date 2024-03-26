@@ -17,32 +17,35 @@ class datasets(object):
     def _intalize(self):
         self.logger.info("Cleaning data")
         for value in self._datasets.values():
-            self.dataset = value
+            self._dataset = value
             self._cleanData()
     
     def _cleanData(self):
         # Drop all empty rows
-        self.dataset.dropna(subset=self.dataset.columns, inplace=True)
+        self._dataset.dropna(subset=self._dataset.columns, inplace=True)
 
-        for col in self.dataset:
-            if not isinstance(self.dataset[col][0], float):
-                variables = set(self.dataset[col])
+        for col in self._dataset:
+            if not isinstance(self._dataset[col][0], float):
+                variables = set(self._dataset[col])
                 changeVar = {}
 
                 for index, var in enumerate(variables, 1):
                     changeVar[var] = index
 
-                self.dataset = self.dataset.reset_index()
-                for val in range(len(self.dataset[col])):
-                    self.dataset.loc[val, col] = changeVar[self.dataset[col][val]]
+                self._dataset = self._dataset.reset_index()
+                for val in range(len(self._dataset[col])):
+                    self._dataset.loc[val, col] = changeVar[self._dataset[col][val]]
 
     @property
     def dataset(self):
         return self._dataset
 
+    # Takes a name and uses the name to get the dataset from the dictionary
     @dataset.setter
-    def dataset(self, dataset):
-        self._dataset = dataset
+    def dataset(self, name: str):
+        if name not in self._datasets:
+            raise ValueError(f"Dataset {name} not found")
+        self._dataset = self._datasets[name]
     
-    def get_dataset_names(self):
+    def get_dataset_names(self) -> list[str]:
         return list(self._datasets.keys())
