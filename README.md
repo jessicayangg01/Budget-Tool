@@ -17,3 +17,8 @@ pip install -r requirements.txt
 
 # Notes to myself
 - note that in the plt.subplot(111) ~ as xyz, x = total rows, y = total cols, z= where graph is placed 
+
+
+# ways to split code
+- split up the popup windows into different classes
+- split up the graphs view
