@@ -17,6 +17,9 @@ from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,  NavigationToo
 from interface.popupWindow import PopupWindow
 import os
 
+from interface.graphViewTypes.marketDataView import MarketDataView
+from interface.graphViewTypes.csvDataView import CsvDataView
+
 
 class GraphsView(object):
     def __init__(self, window, data_logger, event_logger):
@@ -38,29 +41,22 @@ class GraphsView(object):
         # # placing the toolbar on the Tkinter window 
         # self.canvas.get_tk_widget().pack() 
 
-
         self.canvas.get_tk_widget().config(borderwidth=2, relief="solid")
         self.fig.suptitle("Graphs View", fontsize=12)
 
         # Create three Tkinter buttons
-        button1 = Button(self.canvas.get_tk_widget(), text="Calculate")
-        button2 = Button(self.canvas.get_tk_widget(), text="Open File")
-        button3 = Button(self.canvas.get_tk_widget(), text="Predict")
-        button4 = Button(self.canvas.get_tk_widget(), text="Add Market Data")
+        self.button1 = Button(self.canvas.get_tk_widget(), text="Open File")
+        self.button2 = Button(self.canvas.get_tk_widget(), text="Add Market Data")
 
         # Position the buttons at the bottom of the canvas
         window.update_idletasks()
         canvas_height = self.canvas.get_tk_widget().winfo_height()
-        button1.place(x=50, y=canvas_height-50)
-        button2.place(x=150, y=canvas_height-50)
-        button3.place(x=250, y=canvas_height-50)
-        button4.place(x=350, y=canvas_height-50)
+        self.button1.place(x=150, y=canvas_height-50)
+        self.button2.place(x=350, y=canvas_height-50)
 
         # Bind the buttons to their respective functions
-        button1.bind("<Button-1>", self.calculate)
-        button2.bind("<Button-1>", self.openFile)
-        button3.bind("<Button-1>", self.predict)
-        button4.bind("<Button-1>", self.marketData)
+        self.button1.bind("<Button-1>", self.openFile)
+        self.button2.bind("<Button-1>", self.marketData)
 
 
         ### this is for the file 
@@ -80,75 +76,6 @@ class GraphsView(object):
         self.canvas.get_tk_widget().destroy()
 
 
-    def showGraph(self, graph, subplot, title, type, line):
-        self.currPlot = self.fig.add_subplot(subplot)
-        if type == "scatter":
-            self.currPlot.scatter(x =graph[1], y=graph[0], s=1)
-        else:
-            self.currPlot.plot(graph)
-        
-        # plt.xlabel(title) 
-        self.currPlot.set_title(title)
-        self.currPlot.set_xlabel('X Label')
-        self.currPlot.set_ylabel('Y Label')
-        
-
-        # plot line
-        x_vals = np.array(self.currPlot.get_xlim())
-        y_vals = line["intercept"] + line["slope"] * x_vals
-        self.currPlot.plot(x_vals, y_vals, 'r--')
-
-
-        self.fig.subplots_adjust(left=0.1,
-                    bottom=0.1, 
-                    right=0.9, 
-                    top=0.9, 
-                    wspace=0.2, 
-                    hspace=0.6)
-        
-
-        # self.currPlot.draw()
-        self.canvas.draw() 
-        
-
-
-    
-    def plot(self):
-        n=1
-        analyzeBudget = dataAnalysis(self.readBudget, self.data_logger)
-        for col in self.readBudget.getCol():
-            line  = analyzeBudget.linearRegression(col)
-            self.showGraph([self.readBudget.data[self.readBudget.independent_var], self.readBudget.data[col]], 330+n, col, "scatter", line)
-            self.textBox(line)
-            n+=1
-        
-
-    def textBox(self, line):
-        # show text
-        textstr = ""
-        for i in line:
-            textstr += str(i) + ":" + str(line[i])
-            textstr += "\n"
-
-        self.currPlot.text(0, 0, textstr, fontsize = 8, bbox = dict(facecolor = 'white', alpha = 0.5))
-
-        
-    def calculate(self, event): 
-
-        if not self.file:
-            self.event_logger.addtext("no file to read from")
-            return
-        
-        self.event_logger.addtext("Calculating for "+ self.file)
-
-        
-        self.readBudget.dataClean()
-        
-        # analyzeBudget.randomForest()
-        self.plot()
-        self.dataanalyze = self.readBudget
-       
-
     def openFile(self, event):
         filepath = filedialog.askopenfilename(initialdir="C:\\Users\\Cakow\\PycharmProjects\\Main",
                                             title="Open file okay?",
@@ -162,6 +89,7 @@ class GraphsView(object):
             # maybe add a way you can add multiple files
             self.readBudget = budgetReader(self.file, self.data_logger)
             self.open_popup_selectIndependent()
+
         else:
             # File is not a CSV file, handle accordingly
             self.event_logger.addtext("This file type is not supported. Please input a csv file")
@@ -169,11 +97,6 @@ class GraphsView(object):
         
     
         
-    
-
-    def predict(self, event):
-        self.event_logger.addtext("predictions incoming ...")
-        self.open_popup_user_predict("Input your budget data", self.readBudget.getDependentVar())
     
     def marketData(self, event):
         self.stockData = MarketData(self.data_logger)
@@ -184,6 +107,22 @@ class GraphsView(object):
 
 
 #### POPUP STUFF
+        
+    
+    def open_popup_ticker_entry(self, text):
+        # Create and open the popup window
+        def handle_done(ticker):
+            # selected_vars = popup.get_selected_variables()
+            self.data_logger.addtext("Inputed the following ticker: "+ str(ticker))
+            if ticker:
+                self.stockData.addTicker(ticker)
+                self.destroyButtons()
+                newMarketDataView = MarketDataView(self.canvas, self.data_logger, self.event_logger, self.stockData, self.fig)
+            else:
+                self.data_logger.addtext("Invalid ticker inputed.")
+        popup = PopupWindow(self.canvas.get_tk_widget())
+        popup.open_ticker_entry(text, handle_done)
+    
     def open_popup_selectIndependent(self):
         def handle_done(selected_vars):
             # selected_vars = popup.get_selected_variables()
@@ -192,34 +131,13 @@ class GraphsView(object):
                 self.event_logger.addtext("this application does not yet support more than one dependent variable")
 
             self.readBudget.setIndependentVar(selected_vars[0])
-
+            self.destroyButtons()
+            # newCsvDataView = CsvDataView(self.canvas, self.data_logger, self.event_logger, self.file, self.readBudget)
+            newCsvDataView = CsvDataView(self.canvas, self.data_logger, self.event_logger, self.file, self.readBudget, self.fig)
         popup = PopupWindow(self.canvas.get_tk_widget())
         popup.open_variable_list("Select the dependent variable", self.readBudget.getCol(), handle_done)
     
-    def open_popup_error(self, message):
-        # Create and open the popup window
-        popup = PopupWindow(self.canvas.get_tk_widget())
-        popup.open_err_message(message)
-
-
-    
-    def open_popup_user_predict(self, text, variables):
-        # Create and open the popup window
-        def handle_done(selected_vars):
-            # selected_vars = popup.get_selected_variables()
-            self.data_logger.addtext("Inputed the following variables: "+ str(selected_vars))
-            
-            analyzeBudget = dataAnalysis(self.dataanalyze, self.data_logger)
-            analyzeBudget.predict(selected_vars)
-        popup = PopupWindow(self.canvas.get_tk_widget())
-        popup.open_text_entry(text, variables, handle_done)
-        
-    
-    def open_popup_ticker_entry(self, text):
-        # Create and open the popup window
-        def handle_done(ticker):
-            # selected_vars = popup.get_selected_variables()
-            self.data_logger.addtext("Inputed the following ticker: "+ str(ticker))
-            self.stockData.addTicker(ticker)
-        popup = PopupWindow(self.canvas.get_tk_widget())
-        popup.open_ticker_entry(text, handle_done)
+    def destroyButtons(self):
+        # Remove the buttons
+        self.button1.destroy()
+        self.button2.destroy()

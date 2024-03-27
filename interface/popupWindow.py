@@ -126,10 +126,9 @@ class PopupWindow:
         ticker = entry.get().strip()
         if ticker:
             on_enter(ticker)
-            window.destroy()
         else:
-            # showerror("Error", "Please enter a valid ticker")
-            None
+            on_enter("")
+        window.destroy()
 
     def _center_window(self, window):
         canvas_width = self.canvas.winfo_width()
