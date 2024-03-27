@@ -26,7 +26,6 @@ class PopupWindow:
         self._center_window(popup_window)
     
     def open_variable_list(self, text, variables, on_done):
-        print(variables)
         popup_window = Toplevel()
         popup_window.title("Popup Window")
 
@@ -51,7 +50,6 @@ class PopupWindow:
             if var_checkbox.get() == 1:
                 self.selected_variables.append(var)
         window.destroy()
-        # print(self.selected_variables)
         on_done(self.selected_variables)
 
     

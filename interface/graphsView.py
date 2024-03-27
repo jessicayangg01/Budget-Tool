@@ -115,10 +115,8 @@ class GraphsView(object):
         n=1
         analyzeBudget = dataAnalysis(self.readBudget, self.data_logger)
         for col in self.readBudget.getCol():
-            
             line  = analyzeBudget.linearRegression(col)
             self.showGraph([self.readBudget.data[self.readBudget.independent_var], self.readBudget.data[col]], 330+n, col, "scatter", line)
-
             self.textBox(line)
             n+=1
         
@@ -132,7 +130,6 @@ class GraphsView(object):
 
         # these are matplotlib.patch.Patch properties
         self.currPlot.text(0, 0, textstr, fontsize = 8, bbox = dict(facecolor = 'white', alpha = 0.5))
-        print("YES ADD TEXT 3")
 
 
 ### BUTTONS -------------------------------------------
