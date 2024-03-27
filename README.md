@@ -4,7 +4,8 @@ pip install -r requirements.txt
 
 # next steps
 - aghhh i have to figure out what my graphs view does (add file, then clean, then predict?)
-- being able to add different types of data
+- being able to find optimal solution based on a budget
+- https://medium.com/@kasperjuunge/yfinance-10-ways-to-get-stock-data-with-python-6677f49e8282#:~:text=The%20yfinance%20library%20offers%20Python,gather%20and%20analyze%20stock%20information.
 
 
 # things I gotta do

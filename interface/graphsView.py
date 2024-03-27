@@ -3,14 +3,11 @@ from matplotlib.widgets import Button
 from matplotlib.artist import Artist
 import numpy as np
 
-
 from tkinter import filedialog
 from dataProcessing.budgetReader import budgetReader
 from dataProcessing.dataAnalysis import dataAnalysis
+from dataProcessing.marketData import MarketData
 import assets
-
-
-## new
 
 from tkinter import * 
 from matplotlib.figure import Figure 
@@ -49,6 +46,7 @@ class GraphsView(object):
         button1 = Button(self.canvas.get_tk_widget(), text="Calculate")
         button2 = Button(self.canvas.get_tk_widget(), text="Open File")
         button3 = Button(self.canvas.get_tk_widget(), text="Predict")
+        button4 = Button(self.canvas.get_tk_widget(), text="Add Market Data")
 
         # Position the buttons at the bottom of the canvas
         window.update_idletasks()
@@ -56,17 +54,21 @@ class GraphsView(object):
         button1.place(x=50, y=canvas_height-50)
         button2.place(x=150, y=canvas_height-50)
         button3.place(x=250, y=canvas_height-50)
+        button4.place(x=350, y=canvas_height-50)
 
         # Bind the buttons to their respective functions
         button1.bind("<Button-1>", self.calculate)
         button2.bind("<Button-1>", self.openFile)
         button3.bind("<Button-1>", self.predict)
+        button4.bind("<Button-1>", self.marketData)
 
 
         ### this is for the file 
         self.file = None
         # this is for the budget reader
         self.readBudget = None
+        # for stock market
+        self.stockData = None
 
         # popup
         # self.popup_button = Button(self.canvas.get_tk_widget(), text="Open Popup", command=self.open_popup)
@@ -128,26 +130,9 @@ class GraphsView(object):
             textstr += str(i) + ":" + str(line[i])
             textstr += "\n"
 
-        # these are matplotlib.patch.Patch properties
         self.currPlot.text(0, 0, textstr, fontsize = 8, bbox = dict(facecolor = 'white', alpha = 0.5))
 
-
-### BUTTONS -------------------------------------------
-    # def calculate(self, event):
         
-        
-    #     print("button clicked")
-    #     assets.load_dataFiles()
-
-    #     # maybe add a way you can add multiple files
-    #     readBudget = budgetReader(assets.get_dataFile("DummyData"))
-    #     readBudget.dataClean()
-        
-    #     # analyzeBudget.randomForest()
-    #     self.plot(readBudget)
-    #     self.dataanalyze = readBudget
-        
-
     def calculate(self, event): 
 
         if not self.file:
@@ -188,20 +173,18 @@ class GraphsView(object):
 
     def predict(self, event):
         self.event_logger.addtext("predictions incoming ...")
-        self.open_popup_user_predict("testing", self.readBudget.getDependentVar())
+        self.open_popup_user_predict("Input your budget data", self.readBudget.getDependentVar())
+    
+    def marketData(self, event):
+        self.stockData = MarketData(self.data_logger)
+        self.event_logger.addtext("getting market information ...")
+        self.open_popup_ticker_entry("Input a ticker: ")
+        
         
 
 
 #### POPUP STUFF
     def open_popup_selectIndependent(self):
-        # Create and open the popup window
-        # popup = PopupWindow(self.canvas.get_tk_widget())
-        # # popup.open_text_entry("this is the text",print("HI"))
-        # popup.open_variable_list("this is the text",["one", "two", 3, 4])
-        # print("why doesnt this work", popup.get_selected_variables())
-        # # popup.open_text_yes_no("this is the text", print("yes"), print("NO"))
-        
-
         def handle_done(selected_vars):
             # selected_vars = popup.get_selected_variables()
             self.data_logger.addtext("Selected the following variable(s) as dependent variables: "+ str(selected_vars))
@@ -231,3 +214,12 @@ class GraphsView(object):
         popup = PopupWindow(self.canvas.get_tk_widget())
         popup.open_text_entry(text, variables, handle_done)
         
+    
+    def open_popup_ticker_entry(self, text):
+        # Create and open the popup window
+        def handle_done(ticker):
+            # selected_vars = popup.get_selected_variables()
+            self.data_logger.addtext("Inputed the following ticker: "+ str(ticker))
+            self.stockData.addTicker(ticker)
+        popup = PopupWindow(self.canvas.get_tk_widget())
+        popup.open_ticker_entry(text, handle_done)

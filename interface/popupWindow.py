@@ -7,24 +7,6 @@ class PopupWindow:
         self.selected_variables = []
         
 
-    # def open_text_entry(self, text, variables, on_enter):
-    #     popup_window = Toplevel()
-    #     popup_window.title("Text Entry")
-
-    #     label = Label(popup_window, text=text)
-    #     label.pack()
-
-    #     label = Label(popup_window, text="Enter text:")
-    #     label.pack()
-
-    #     text_box = Text(popup_window, height=4, width=30)
-    #     text_box.pack()
-
-    #     button_enter = Button(popup_window, text="Enter", command=lambda: on_enter(text_box.get("1.0", "end-1c")))
-    #     button_enter.pack()
-
-    #     self._center_window(popup_window)
-    
     def open_text_entry(self, text, variables, on_enter):
         popup_window = Toplevel()
         popup_window.title("Text Entry")
@@ -50,13 +32,17 @@ class PopupWindow:
         text_entries = {}
         for i, text_box in enumerate(text_boxes):
             prompt = variables[i]  # Get the prompt text from the label
-            if val := text_box.get("1.0", "end-1c"):
-                if val.isnumeric():
+            val = text_box.get("1.0", "end-1c").strip()
+            if val:
+                if val.isdigit():  # Check if input is a valid integer
                     text_entries[prompt] = int(val)
-            if prompt not in text_entries:
+                elif val.replace('.', '', 1).isdigit():  # Check if input is a valid float
+                    text_entries[prompt] = float(val)
+                else:
+                    text_entries[prompt] = 0  # If input is neither integer nor float, set it to 0
+            else:
                 text_entries[prompt] = 0
-                # add in error later
-            # text_box.get("1.0", "end-1c")
+
         
         print(text_entries)
         on_enter(text_entries)
@@ -119,6 +105,31 @@ class PopupWindow:
         button_no.pack(side="left")
 
         self._center_window(popup_window)
+    
+
+    def open_ticker_entry(self, text, on_enter):
+        popup_window = Toplevel()
+        popup_window.title("Ticker Entry")
+
+        label = Label(popup_window, text=text)
+        label.pack()
+
+        entry = Entry(popup_window, width=30)
+        entry.pack()
+
+        button_enter = Button(popup_window, text="Okay", command=lambda: self._get_ticker_entry(entry, on_enter, popup_window))
+        button_enter.pack()
+
+        self._center_window(popup_window)
+
+    def _get_ticker_entry(self, entry, on_enter, window):
+        ticker = entry.get().strip()
+        if ticker:
+            on_enter(ticker)
+            window.destroy()
+        else:
+            # showerror("Error", "Please enter a valid ticker")
+            None
 
     def _center_window(self, window):
         canvas_width = self.canvas.winfo_width()
