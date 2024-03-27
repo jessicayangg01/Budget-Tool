@@ -7,12 +7,17 @@ class budgetReader(object):
         
         self.data_logger = data_logger
         self.data_logger.addtext("Data loaded successfully.")
+
+        self.independent_var = None
     
     def getCol(self):
-        return self.data.columns
+        return self.data.columns.tolist()
 
     def numRows(self):
         return len(self.data)
+    
+    def setIndependentVar(self, var):
+        self.independent_var = str(var)
     
     def dataClean(self):
         self.data_logger.addtext("________________________________________________________ ")

@@ -16,6 +16,9 @@ from tkinter import *
 from matplotlib.figure import Figure 
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,  NavigationToolbar2Tk) 
 
+# popup
+from interface.popupWindow import PopupWindow
+
 
 
 class GraphsView(object):
@@ -62,7 +65,13 @@ class GraphsView(object):
 
         ### this is for the file 
         self.file = None
+        # this is for the budget reader
+        self.readBudget = None
 
+        # popup
+        # self.popup_button = Button(self.canvas.get_tk_widget(), text="Open Popup", command=self.open_popup)
+        # self.popup_button.place(x=350, y=canvas_height-50)
+                
 
 
     def remove(self):
@@ -102,21 +111,15 @@ class GraphsView(object):
 
 
     
-    def plot(self, readBudget):
+    def plot(self):
         n=1
-        analyzeBudget = dataAnalysis(readBudget, self.data_logger)
-        for col in readBudget.getCol():
-            line  = analyzeBudget.linearRegression(col)
-            # values = {}
-            # values["slope"] = model.coef_[0]
-            # values["intercept"] = model.intercept_
-            # # values["r squared"] = model.score(X, Y)
-            self.showGraph([readBudget.data["Sales"], readBudget.data[col]], 330+n, col, "scatter", line)
-
-            # new line
+        analyzeBudget = dataAnalysis(self.readBudget, self.data_logger)
+        for col in self.readBudget.getCol():
             
-            self.textBox(line)
+            line  = analyzeBudget.linearRegression(col)
+            self.showGraph([self.readBudget.data[self.readBudget.independent_var], self.readBudget.data[col]], 330+n, col, "scatter", line)
 
+            self.textBox(line)
             n+=1
         
 
@@ -156,13 +159,12 @@ class GraphsView(object):
         
         self.event_logger.addtext("Calculating for "+ self.file)
 
-        # maybe add a way you can add multiple files
-        readBudget = budgetReader(self.file, self.data_logger)
-        readBudget.dataClean()
+        
+        self.readBudget.dataClean()
         
         # analyzeBudget.randomForest()
-        self.plot(readBudget)
-        self.dataanalyze = readBudget
+        self.plot()
+        self.dataanalyze = self.readBudget
        
 
     def openFile(self, event):
@@ -176,9 +178,37 @@ class GraphsView(object):
         file.close()
         self.event_logger.addtext("added file "+ filepath)
         
+        # maybe add a way you can add multiple files
+        self.readBudget = budgetReader(self.file, self.data_logger)
+        self.open_popup_selectIndependent()
+
+
+        
     
 
     def predict(self, event):
         self.event_logger.addtext("predictions incoming ...")
         analyzeBudget = dataAnalysis(self.dataanalyze, self.data_logger)
         analyzeBudget.predict([[1, 16,6.566230788,2.907982773,1]])
+
+
+#### POPUP STUFF
+    def open_popup_selectIndependent(self):
+        # Create and open the popup window
+        # popup = PopupWindow(self.canvas.get_tk_widget())
+        # # popup.open_text_entry("this is the text",print("HI"))
+        # popup.open_variable_list("this is the text",["one", "two", 3, 4])
+        # print("why doesnt this work", popup.get_selected_variables())
+        # # popup.open_text_yes_no("this is the text", print("yes"), print("NO"))
+        
+
+        def handle_done(selected_vars):
+            # selected_vars = popup.get_selected_variables()
+            self.data_logger.addtext("Selected the following variable(s) as dependent variables: "+ str(selected_vars))
+            if len(selected_vars) > 1:
+                self.event_logger.addtext("this application does not yet support more than one dependent variable")
+
+            self.readBudget.setIndependentVar(selected_vars[0])
+
+        popup = PopupWindow(self.canvas.get_tk_widget())
+        popup.open_variable_list("Select the dependent variable", self.readBudget.getCol(), handle_done)

@@ -15,8 +15,8 @@ class dataAnalysis(object):
 
     
     def linearRegression(self, col):
-        Y = np.array(self.budgetReader.data["Sales"])
-        # .reshape((1, -1))      
+        # Y = np.array(self.budgetReader.data["Sales"])
+        Y = np.array(self.budgetReader.data[self.budgetReader.independent_var])
 
         # predictor
         X = np.array(self.budgetReader.data[col]).reshape((-1, 1))
@@ -49,8 +49,8 @@ class dataAnalysis(object):
 
     def predict(self, predict_data):
         self.data_logger.addtext("predict")
-        X = self.budgetReader.data[[i for i in self.budgetReader.data if i!="Sales"]]
-        Y = self.budgetReader.data["Sales"]
+        X = self.budgetReader.data[[i for i in self.budgetReader.data if i!=self.budgetReader.independent_var]]
+        Y = self.budgetReader.data[self.budgetReader.independent_var]
         model = LinearRegression().fit(X, Y)
 
         predicted_values = model.predict(predict_data)
@@ -61,8 +61,8 @@ class dataAnalysis(object):
         return
     
     def accuracy(self, percent):
-        Y = self.budgetReader.data["Sales"]
-        X = self.budgetReader.data[[i for i in self.budgetReader.data if i!="Sales"]]
+        Y = self.budgetReader.data[self.budgetReader.independent_var]
+        X = self.budgetReader.data[[i for i in self.budgetReader.data if i!=self.budgetReader.independent_var]]
         x_train, x_test,y_train,y_test = train_test_split(X,Y,test_size =percent)
 
         model = LinearRegression().fit(x_train, y_train)
