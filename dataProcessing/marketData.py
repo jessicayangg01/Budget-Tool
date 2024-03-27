@@ -54,6 +54,12 @@ class MarketData(object):
             years = data.columns.tolist()
             years = [timestamp.year for timestamp in years]
             ratio = [a / b for a, b in zip(Y_vals, X_vals)]
+
+            self.data_logger.addtext("Here is the data for " + ticker + " for ...")
+            self.data_logger.addtext(dep + " : " + str(Y_vals))
+            self.data_logger.addtext(ind + " : " + str(X_vals))
+            self.data_logger.addtext("Creates ratio of : " + str(ratio))
+            self.data_logger.addtext("Across Years : " + str(years))
             return {"years": years, "ratio": ratio}
         self.data_logger.addtext("Error getting ticker variables")
     
