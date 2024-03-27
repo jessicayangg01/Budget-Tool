@@ -18,7 +18,7 @@ from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,  NavigationToo
 
 # popup
 from interface.popupWindow import PopupWindow
-
+import os
 
 
 class GraphsView(object):
@@ -167,26 +167,29 @@ class GraphsView(object):
     def openFile(self, event):
         filepath = filedialog.askopenfilename(initialdir="C:\\Users\\Cakow\\PycharmProjects\\Main",
                                             title="Open file okay?",
-                                            filetypes= (("text files","*.txt"),
+                                            filetypes=(("CSV files", "*.csv"),
                                             ("all files","*.*")))
-        file = open(filepath,'r')
-        self.file = filepath
-        # print(file.read())
-        file.close()
-        self.event_logger.addtext("added file "+ filepath)
         
-        # maybe add a way you can add multiple files
-        self.readBudget = budgetReader(self.file, self.data_logger)
-        self.open_popup_selectIndependent()
-
-
+        if filepath and os.path.splitext(filepath)[1] == ".csv":
+            # File is a CSV file, proceed with your code
+            self.event_logger.addtext("added file "+ filepath)
+            self.file = filepath
+            # maybe add a way you can add multiple files
+            self.readBudget = budgetReader(self.file, self.data_logger)
+            self.open_popup_selectIndependent()
+        else:
+            # File is not a CSV file, handle accordingly
+            self.event_logger.addtext("This file type is not supported. Please input a csv file")
+            self.open_popup_error("This file type is not supported. Please input a csv file")
+        
+    
         
     
 
     def predict(self, event):
         self.event_logger.addtext("predictions incoming ...")
-        analyzeBudget = dataAnalysis(self.dataanalyze, self.data_logger)
-        analyzeBudget.predict([[1, 16,6.566230788,2.907982773,1]])
+        self.open_popup_user_predict("testing", self.readBudget.getDependentVar())
+        
 
 
 #### POPUP STUFF
@@ -209,3 +212,22 @@ class GraphsView(object):
 
         popup = PopupWindow(self.canvas.get_tk_widget())
         popup.open_variable_list("Select the dependent variable", self.readBudget.getCol(), handle_done)
+    
+    def open_popup_error(self, message):
+        # Create and open the popup window
+        popup = PopupWindow(self.canvas.get_tk_widget())
+        popup.open_err_message(message)
+
+
+    
+    def open_popup_user_predict(self, text, variables):
+        # Create and open the popup window
+        def handle_done(selected_vars):
+            # selected_vars = popup.get_selected_variables()
+            self.data_logger.addtext("Inputed the following variables: "+ str(selected_vars))
+            
+            analyzeBudget = dataAnalysis(self.dataanalyze, self.data_logger)
+            analyzeBudget.predict(selected_vars)
+        popup = PopupWindow(self.canvas.get_tk_widget())
+        popup.open_text_entry(text, variables, handle_done)
+        

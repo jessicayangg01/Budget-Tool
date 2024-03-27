@@ -47,13 +47,17 @@ class dataAnalysis(object):
 
         return values
 
-    def predict(self, predict_data):
-        self.data_logger.addtext("predict")
+    def predict(self, data_given:dict):
+        self.data_logger.addtext("___________________________________________________________________")
+        self.data_logger.addtext("Predicting for values...")
+        self.data_logger.addtext(str(data_given))
+        
         X = self.budgetReader.data[[i for i in self.budgetReader.data if i!=self.budgetReader.independent_var]]
         Y = self.budgetReader.data[self.budgetReader.independent_var]
         model = LinearRegression().fit(X, Y)
 
-        predicted_values = model.predict(predict_data)
+        predicted_values = model.predict([list(data_given.values())])
+
 
         self.data_logger.addtext(str(predicted_values))
         self.accuracy(0.2)

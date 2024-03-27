@@ -18,6 +18,10 @@ class budgetReader(object):
     
     def setIndependentVar(self, var):
         self.independent_var = str(var)
+
+    # return list of dependent
+    def getDependentVar(self):
+        return [x for x in self.getCol() if x!=self.independent_var]
     
     def dataClean(self):
         self.data_logger.addtext("________________________________________________________ ")

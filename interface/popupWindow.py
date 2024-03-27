@@ -7,27 +7,79 @@ class PopupWindow:
         self.selected_variables = []
         
 
-    def open_text_entry(self, text, on_enter):
+    # def open_text_entry(self, text, variables, on_enter):
+    #     popup_window = Toplevel()
+    #     popup_window.title("Text Entry")
+
+    #     label = Label(popup_window, text=text)
+    #     label.pack()
+
+    #     label = Label(popup_window, text="Enter text:")
+    #     label.pack()
+
+    #     text_box = Text(popup_window, height=4, width=30)
+    #     text_box.pack()
+
+    #     button_enter = Button(popup_window, text="Enter", command=lambda: on_enter(text_box.get("1.0", "end-1c")))
+    #     button_enter.pack()
+
+    #     self._center_window(popup_window)
+    
+    def open_text_entry(self, text, variables, on_enter):
         popup_window = Toplevel()
-        popup_window.title("Popup Window")
+        popup_window.title("Text Entry")
 
         label = Label(popup_window, text=text)
         label.pack()
 
-        label = Label(popup_window, text="Enter text:")
+        text_boxes = []
+        for prompt in variables:
+            label = Label(popup_window, text=prompt)
+            label.pack()
+
+            text_box = Text(popup_window, height=4, width=30)
+            text_box.pack()
+            text_boxes.append(text_box)
+
+        button_enter = Button(popup_window, text="Enter", command=lambda: self._get_text_entries(text_boxes, variables, on_enter, popup_window))
+        button_enter.pack()
+
+        self._center_window(popup_window)
+
+    def _get_text_entries(self, text_boxes, variables, on_enter, window):
+        text_entries = {}
+        for i, text_box in enumerate(text_boxes):
+            prompt = variables[i]  # Get the prompt text from the label
+            if val := text_box.get("1.0", "end-1c"):
+                if val.isnumeric():
+                    text_entries[prompt] = int(val)
+            if prompt not in text_entries:
+                text_entries[prompt] = 0
+                # add in error later
+            # text_box.get("1.0", "end-1c")
+        
+        print(text_entries)
+        on_enter(text_entries)
+        window.destroy()
+    
+    def open_err_message(self, text):
+        popup_window = Toplevel()
+        popup_window.title("Error Message")
+
+        label = Label(popup_window, text=text)
         label.pack()
 
-        text_box = Text(popup_window, height=4, width=30)
-        text_box.pack()
+        def ok(window):
+            window.destroy()  # Close the popup window after clicking "Yes"
 
-        button_enter = Button(popup_window, text="Enter", command=lambda: on_enter(text_box.get("1.0", "end-1c")))
-        button_enter.pack()
+        button = Button(popup_window, text="Okay", command=lambda: ok(popup_window))
+        button.pack()
 
         self._center_window(popup_window)
     
     def open_variable_list(self, text, variables, on_done):
         popup_window = Toplevel()
-        popup_window.title("Popup Window")
+        popup_window.title("Select Menu")
 
         label = Label(popup_window, text=text)
         label.pack()
@@ -55,7 +107,7 @@ class PopupWindow:
     
     def open_text_yes_no(self, text, on_yes, on_no):
         popup_window = Toplevel()
-        popup_window.title("Popup Window")
+        popup_window.title("Select Menu")
 
         label = Label(popup_window, text=text)
         label.pack()
