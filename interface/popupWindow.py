@@ -105,6 +105,31 @@ class PopupWindow:
         button_no.pack(side="left")
 
         self._center_window(popup_window)
+    
+
+    def open_ticker_entry(self, text, on_enter):
+        popup_window = Toplevel()
+        popup_window.title("Ticker Entry")
+
+        label = Label(popup_window, text=text)
+        label.pack()
+
+        entry = Entry(popup_window, width=30)
+        entry.pack()
+
+        button_enter = Button(popup_window, text="Okay", command=lambda: self._get_ticker_entry(entry, on_enter, popup_window))
+        button_enter.pack()
+
+        self._center_window(popup_window)
+
+    def _get_ticker_entry(self, entry, on_enter, window):
+        ticker = entry.get().strip()
+        if ticker:
+            on_enter(ticker)
+            window.destroy()
+        else:
+            # showerror("Error", "Please enter a valid ticker")
+            None
 
     def _center_window(self, window):
         canvas_width = self.canvas.winfo_width()

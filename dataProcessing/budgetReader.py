@@ -3,6 +3,11 @@ import pandas as pd
 class budgetReader(object):
     def __init__(self, fileName, data_logger):
         self.data = pd.read_csv(fileName)
+        
+        ## added
+        # self.data.info()
+        # self.data.describe()
+
         self.filename = fileName
         
         self.data_logger = data_logger
