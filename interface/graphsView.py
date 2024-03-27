@@ -100,8 +100,10 @@ class GraphsView(object):
     
     def marketData(self, event):
         self.stockData = MarketData(self.data_logger)
-        self.event_logger.addtext("getting market information ...")
-        self.open_popup_ticker_entry("Input a ticker: ")
+        newMarketDataView = MarketDataView(self.canvas, self.data_logger, self.event_logger, self.stockData, self.fig)
+        self.destroyButtons()
+        # self.event_logger.addtext("getting market information ...")
+        # self.open_popup_ticker_entry("Input a ticker: ")
         
         
 
@@ -109,19 +111,19 @@ class GraphsView(object):
 #### POPUP STUFF
         
     
-    def open_popup_ticker_entry(self, text):
-        # Create and open the popup window
-        def handle_done(ticker):
-            # selected_vars = popup.get_selected_variables()
-            self.data_logger.addtext("Inputed the following ticker: "+ str(ticker))
-            if ticker:
-                self.stockData.addTicker(ticker)
-                self.destroyButtons()
-                newMarketDataView = MarketDataView(self.canvas, self.data_logger, self.event_logger, self.stockData, self.fig)
-            else:
-                self.data_logger.addtext("Invalid ticker inputed.")
-        popup = PopupWindow(self.canvas.get_tk_widget())
-        popup.open_ticker_entry(text, handle_done)
+    # def open_popup_ticker_entry(self, text):
+    #     # Create and open the popup window
+    #     def handle_done(ticker):
+    #         # selected_vars = popup.get_selected_variables()
+    #         self.data_logger.addtext("Inputed the following ticker: "+ str(ticker))
+    #         if ticker:
+    #             self.stockData.addTicker(ticker)
+    #             self.destroyButtons()
+    #             newMarketDataView = MarketDataView(self.canvas, self.data_logger, self.event_logger, self.stockData, self.fig)
+    #         else:
+    #             self.data_logger.addtext("Invalid ticker inputed.")
+    #     popup = PopupWindow(self.canvas.get_tk_widget())
+    #     popup.open_ticker_entry(text, handle_done)
     
     def open_popup_selectIndependent(self):
         def handle_done(selected_vars):

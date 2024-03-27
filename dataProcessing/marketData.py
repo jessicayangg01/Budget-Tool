@@ -1,4 +1,6 @@
 import yfinance as yf
+import pandas as pd
+
 
 class MarketData(object):
     def __init__(self, data_logger) -> None:
@@ -22,6 +24,7 @@ class MarketData(object):
             self.data_logger.addtext("Sector: " +  company_info.get('sector', 'N/A'))
             self.data_logger.addtext("Country: " +  company_info.get('country', 'N/A'))
             self.data_logger.addtext("Company Website: " +  company_info.get('website', 'N/A'))
+            self.data_logger.addtext("____________________________________________________")
 
         except Exception as e:
             self.data_logger.addtext(f"Error adding {ticker} to the ticker list: {e}")
@@ -30,7 +33,11 @@ class MarketData(object):
     def getIncomeStatement(self, ticker):
         try:
             if ticker in self.tickerList:
-                return self.tickerList[ticker].keys()
+                # Assuming self.tickerList[ticker] contains your DataFrame
+                df = self.tickerList[ticker]
+                # Get all the names of the rows (index)
+                row_names = df.index.tolist()
+                return row_names
             else:
                 raise ValueError(f"{ticker} not found in the ticker list.")
         except Exception as e:
@@ -39,8 +46,15 @@ class MarketData(object):
     
     def getVars(self, ticker, dep, ind):
         if ticker in self.tickerList:
-            if ind in self.tickerList[ticker] and dep in self.tickerList[ticker]:
-                return {"X": self.tickerList[ticker][ind], "Y": self.tickerList[ticker][dep]}
+            # Assuming self.tickerList[ticker] contains your DataFrame
+            data = self.tickerList[ticker]
+            # Extracting Total Revenue, Operating Revenue, and the years
+            X_vals = data.loc[ind].values
+            Y_vals = data.loc[dep].values
+            years = data.columns.tolist()
+            years = [timestamp.year for timestamp in years]
+            ratio = [a / b for a, b in zip(Y_vals, X_vals)]
+            return {"years": years, "ratio": ratio}
         self.data_logger.addtext("Error getting ticker variables")
     
     def getTickerRecommendations(self):
@@ -62,3 +76,12 @@ class MarketData(object):
         except Exception as e:
             print(f"Error reading or processing tickers: {e}")
         return recommendations
+
+
+    def removeTicker(self, ticker):
+        if ticker in self.tickerList:
+            del self.tickerList[ticker]
+            self.data_logger.addtext(f"Removed {ticker} from the ticker list.")
+        else:
+            self.data_logger.addtext(f"{ticker} not found in the ticker list.")
+
