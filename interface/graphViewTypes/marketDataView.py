@@ -28,23 +28,58 @@ class MarketDataView(object):
 
         self.allPlotLines = {}
 
+        # # Create three Tkinter buttons
+        # button1 = Button(self.canvas.get_tk_widget(), text="Add Ticker")
+        # button2 = Button(self.canvas.get_tk_widget(), text="Remove Ticker")
+        # button3 = Button(self.canvas.get_tk_widget(), text="Predict")
+
+        # # Position the buttons at the bottom of the canvas
+        # canvas_height = self.canvas.get_tk_widget().winfo_height()
+        # button1.place(x=50, y=canvas_height-50)
+        # button2.place(x=150, y=canvas_height-50)
+        # button3.place(x=250, y=canvas_height-50)
+
+        # # Bind the buttons to their respective functions
+        # button1.bind("<Button-1>", self.add)
+        # button2.bind("<Button-1>", self.remove)
+        # button3.bind("<Button-1>", self.predict)
+
+
+        # placing the canvas on the Tkinter window 
+        self.canvas.get_tk_widget().pack(fill="both", expand=True)  # Fill the entire window
+        
+        self.canvas.get_tk_widget().config(borderwidth=2, relief="solid")
+        self.fig.suptitle("Graphs View", fontsize=12)
+
         # Create three Tkinter buttons
-        button1 = Button(self.canvas.get_tk_widget(), text="Add Ticker")
-        button2 = Button(self.canvas.get_tk_widget(), text="Remove Ticker")
-        button3 = Button(self.canvas.get_tk_widget(), text="Predict")
+        button1 = Button(self.canvas.get_tk_widget(), text="Add Ticker", width=25)
+        button2 = Button(self.canvas.get_tk_widget(), text="Remove Ticker", width=25)
+        button3 = Button(self.canvas.get_tk_widget(), text="Predict", width=25)
 
         # Position the buttons at the bottom of the canvas
         canvas_height = self.canvas.get_tk_widget().winfo_height()
         button1.place(x=50, y=canvas_height-50)
-        button2.place(x=150, y=canvas_height-50)
-        button3.place(x=250, y=canvas_height-50)
+        button2.place(x=250, y=canvas_height-50)
+        button3.place(x=450, y=canvas_height-50)
 
         # Bind the buttons to their respective functions
         button1.bind("<Button-1>", self.add)
         button2.bind("<Button-1>", self.remove)
         button3.bind("<Button-1>", self.predict)
 
+        # Change button color on hover
+        def change_button_color(button, color):
+            button.config(bg=color)
+
+        button1.bind("<Enter>", lambda event: change_button_color(button1, "#4CAF50"))  # Green color on hover
+        button1.bind("<Leave>", lambda event: change_button_color(button1, "SystemButtonFace"))  # Original color on leave
+        button2.bind("<Enter>", lambda event: change_button_color(button2, "#4CAF50"))  # Green color on hover
+        button2.bind("<Leave>", lambda event: change_button_color(button2, "SystemButtonFace"))  # Original color on leave
+        button3.bind("<Enter>", lambda event: change_button_color(button3, "#4CAF50"))  # Green color on hover
+        button3.bind("<Leave>", lambda event: change_button_color(button3, "SystemButtonFace"))  # Original color on leave
+        
         self.showGraph("Market Data")
+
     
 ####################### ADD  
     def add(self, event):
@@ -112,7 +147,12 @@ class MarketDataView(object):
     ############## GRAPH STUFF
         
     def showGraph(self, title):
-        self.currPlot = self.fig.add_subplot(111)
+        # self.currPlot = self.fig.add_subplot(111)
+
+        bottom_margin = 0.15  # Adjust this value as needed to leave enough space for the buttons
+        self.currPlot = self.fig.add_subplot(111, position=[0.1, bottom_margin, 0.8, 0.8 - bottom_margin])
+
+    
         
         # plt.xlabel(title) 
         self.currPlot.set_title(title)

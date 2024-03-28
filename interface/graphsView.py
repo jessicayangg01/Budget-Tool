@@ -44,20 +44,30 @@ class GraphsView(object):
         self.canvas.get_tk_widget().config(borderwidth=2, relief="solid")
         self.fig.suptitle("Graphs View", fontsize=12)
 
+        # placing the canvas on the Tkinter window 
+        self.canvas.get_tk_widget().pack(fill="both", expand=True)  # Fill the entire window
+        
+        self.canvas.get_tk_widget().config(borderwidth=2, relief="solid")
+        self.fig.suptitle("Graphs View", fontsize=12)
+
         # Create three Tkinter buttons
-        self.button1 = Button(self.canvas.get_tk_widget(), text="Open File")
-        self.button2 = Button(self.canvas.get_tk_widget(), text="Add Market Data")
+        self.button1 = Button(self.canvas.get_tk_widget(), text="Open File", width=self.canvas.get_tk_widget().winfo_width(), height=2)
+        self.button2 = Button(self.canvas.get_tk_widget(), text="Add Market Data", width=self.canvas.get_tk_widget().winfo_width(), height=2)
 
         # Position the buttons at the bottom of the canvas
-        window.update_idletasks()
-        canvas_height = self.canvas.get_tk_widget().winfo_height()
-        self.button1.place(x=150, y=canvas_height-50)
-        self.button2.place(x=350, y=canvas_height-50)
+        self.button1.pack(side="bottom", fill="x")  # Stretch horizontally
+        self.button2.pack(side="bottom", fill="x")  # Stretch horizontally
 
         # Bind the buttons to their respective functions
         self.button1.bind("<Button-1>", self.openFile)
         self.button2.bind("<Button-1>", self.marketData)
 
+        # Change button color on hover
+        self.button1.bind("<Enter>", lambda event: self.button1.config(bg="#4CAF50"))  # Green color on hover
+        self.button1.bind("<Leave>", lambda event: self.button1.config(bg="SystemButtonFace"))  # Original color on leave
+        self.button2.bind("<Enter>", lambda event: self.button2.config(bg="#4CAF50"))  # Green color on hover
+        self.button2.bind("<Leave>", lambda event: self.button2.config(bg="SystemButtonFace"))  # Original color on leave
+        
 
         ### this is for the file 
         self.file = None
@@ -100,8 +110,8 @@ class GraphsView(object):
     
     def marketData(self, event):
         self.stockData = MarketData(self.data_logger)
-        newMarketDataView = MarketDataView(self.canvas, self.data_logger, self.event_logger, self.stockData, self.fig)
         self.destroyButtons()
+        newMarketDataView = MarketDataView(self.canvas, self.data_logger, self.event_logger, self.stockData, self.fig)
         # self.event_logger.addtext("getting market information ...")
         # self.open_popup_ticker_entry("Input a ticker: ")
         

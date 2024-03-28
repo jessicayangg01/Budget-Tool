@@ -27,15 +27,45 @@ class CsvDataView(object):
         self.readBudget = readBudget
         self.fig = fig
 
-        button1 = Button(self.canvas.get_tk_widget(), text="Calculate")
-        button3 = Button(self.canvas.get_tk_widget(), text="Predict")
+        # placing the canvas on the Tkinter window 
+        self.canvas.get_tk_widget().pack(fill="both", expand=True)  # Fill the entire window
+        
+        self.canvas.get_tk_widget().config(borderwidth=2, relief="solid")
+        self.fig.suptitle("Graphs View", fontsize=12)
 
+        # button1 = Button(self.canvas.get_tk_widget(), text="Calculate")
+        # button3 = Button(self.canvas.get_tk_widget(), text="Predict")
+
+        # canvas_height = self.canvas.get_tk_widget().winfo_height()
+        # button1.place(x=50, y=canvas_height-50)
+        # button3.place(x=250, y=canvas_height-50)
+
+        # button3.bind("<Button-1>", self.predict)
+        # button1.bind("<Button-1>", self.calculate)
+
+        # Create two Tkinter buttons
+        self.button1 = Button(self.canvas.get_tk_widget(), text="Calculate", width=35)
+        self.button3 = Button(self.canvas.get_tk_widget(), text="Predict", width=35)
+
+        # Position the buttons at the bottom of the canvas
         canvas_height = self.canvas.get_tk_widget().winfo_height()
-        button1.place(x=50, y=canvas_height-50)
-        button3.place(x=250, y=canvas_height-50)
+        self.button1.place(x=50, y=canvas_height-50)
+        self.button3.place(x=350, y=canvas_height-50)
 
-        button3.bind("<Button-1>", self.predict)
-        button1.bind("<Button-1>", self.calculate)
+        # Bind the buttons to their respective functions
+        self.button1.bind("<Button-1>", self.calculate)
+        self.button3.bind("<Button-1>", self.predict)
+
+        # Change button color on hover
+        def change_button_color(button, color):
+            button.config(bg=color)
+
+        self.button1.bind("<Enter>", lambda event: change_button_color(self.button1, "#4CAF50"))  # Green color on hover
+        self.button1.bind("<Leave>", lambda event: change_button_color(self.button1, "SystemButtonFace"))  # Original color on leave
+        self.button3.bind("<Enter>", lambda event: change_button_color(self.button3, "#4CAF50"))  # Green color on hover
+        self.button3.bind("<Leave>", lambda event: change_button_color(self.button3, "SystemButtonFace"))  # Original color on leave
+
+
 
     def predict(self, event):
         self.event_logger.addtext("predictions incoming ...")
