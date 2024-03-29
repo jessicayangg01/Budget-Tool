@@ -5,8 +5,8 @@ import numpy as np
 
 from tkinter import filedialog
 from dataProcessing.budgetReader import budgetReader
-from dataProcessing.dataAnalysis import dataAnalysis
-from dataProcessing.marketData import MarketData
+from dataProcessing.marketDataAnalysis import MarketDataAnalysis
+
 import assets
 
 from tkinter import * 
@@ -16,6 +16,7 @@ from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,  NavigationToo
 # popup
 from interface.popupWindow import PopupWindow
 import os
+import csv
 
 
 class MarketDataView(object):
@@ -139,7 +140,10 @@ class MarketDataView(object):
 
     
     def predict(self, event):
-        print("not done, remove")
+        marketDataAnalysis = MarketDataAnalysis(self.stockData.plotList, self.data_logger)
+        self.textBox(marketDataAnalysis.linearRegression)
+
+
 
 
     

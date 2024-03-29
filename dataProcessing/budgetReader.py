@@ -2,6 +2,10 @@ import pandas as pd
 
 class budgetReader(object):
     def __init__(self, fileName, data_logger):
+
+        print(fileName)
+        print("HERE")
+
         self.data = pd.read_csv(fileName)
         
         ## added
@@ -9,7 +13,6 @@ class budgetReader(object):
         # self.data.describe()
 
         self.filename = fileName
-        
         self.data_logger = data_logger
         self.data_logger.addtext("Data loaded successfully.")
 
