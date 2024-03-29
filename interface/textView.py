@@ -35,13 +35,27 @@ class mainWindow(object):
 
     
 
+        # # Create a plot button
+        # self.plot_button = Button(master=self.win, 
+        #                           command=self.plot,
+        #                           height=2, 
+        #                           width=10, 
+        #                           text="Add New Plot") 
+        # self.plot_button.pack(side=BOTTOM, pady=10)
+
         # Create a plot button
         self.plot_button = Button(master=self.win, 
                                   command=self.plot,
                                   height=2, 
                                   width=10, 
-                                  text="Add New Plot") 
-        self.plot_button.pack(side=BOTTOM, pady=10)
+                                  text="Add New Plot",
+                                  bg="dark grey")
+        self.plot_button.pack(side=BOTTOM, fill=X, pady=10)  # Fill the entire bottom space
+
+        # Bind events to change button color on hover
+        self.plot_button.bind("<Enter>", lambda event: self.change_button_color("#4CAF50"))  # Green color on hover
+        self.plot_button.bind("<Leave>", lambda event: self.change_button_color("dark grey"))  # Original color on leave
+
 
         # Initialize a list to hold GraphsView instances
         self.graph_views = []
@@ -65,3 +79,6 @@ class mainWindow(object):
 
         # Pack the new GraphsView instance within the content frame
         new_graph_view.canvas.get_tk_widget().pack(side=LEFT, fill=BOTH, expand=True)
+    
+    def change_button_color(self, color):
+            self.plot_button.config(bg=color)
