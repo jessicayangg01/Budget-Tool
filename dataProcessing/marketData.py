@@ -6,6 +6,8 @@ class MarketData(object):
     def __init__(self, data_logger) -> None:
         self.tickerList = {}
         self.data_logger = data_logger
+
+        self.plotList = {"X" : [], "Y": []}
     
 
     def addTicker(self, ticker):
@@ -54,6 +56,10 @@ class MarketData(object):
             years = data.columns.tolist()
             years = [timestamp.year for timestamp in years]
             ratio = [a / b for a, b in zip(Y_vals, X_vals)]
+
+            ## add to list
+            self.plotList["X"] += X_vals
+            self.plotList["Y"] += Y_vals
 
             self.data_logger.addtext("Here is the data for " + ticker + " for ...")
             self.data_logger.addtext(dep + " : " + str(Y_vals))
