@@ -26,9 +26,9 @@ class GraphTabs:
 
         self.TimeSeries = self.create_graph("Time Series Analysis")
         # self.Correlation = self.create_graph("Correlation Analysis")
-        self.Reg = self.create_graph("Regression Analysis")
+        self.Reg = self.create_graph("Linear Regression")
         # self.ROI = self.create_graph("Return on Investment Analysis")
-        self.Predict = self.create_graph("Predictive Modelling")
+        self.Predict = self.create_graph("Random Forest Regression")
 
 
         self.allPlotLines1 = {}

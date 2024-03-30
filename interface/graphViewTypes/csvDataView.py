@@ -28,6 +28,11 @@ class CsvDataView(object):
         self.readBudget = readBudget
         self.fig = fig
 
+        self.deg = 2
+
+        # type of predict
+        self.reg_type = None
+
         # placing the canvas on the Tkinter window 
         self.canvas.get_tk_widget().pack(fill="both", expand=True)  # Fill the entire window
         self.canvas.get_tk_widget().config(borderwidth=2, relief="solid")
@@ -36,16 +41,19 @@ class CsvDataView(object):
 
 
         # Create two Tkinter buttons
-        self.button1 = Button(self.canvas.get_tk_widget(), text="Calculate", width=35)
-        self.button3 = Button(self.canvas.get_tk_widget(), text="Predict", width=35)
+        self.button1 = Button(self.canvas.get_tk_widget(), text="Linear Reg", width=20)
+        self.button2 = Button(self.canvas.get_tk_widget(), text="Polynomial Reg", width=20)
+        self.button3 = Button(self.canvas.get_tk_widget(), text="Predict", width=20)
 
         # Position the buttons at the bottom of the canvas
         canvas_height = self.canvas.get_tk_widget().winfo_height()
         self.button1.place(x=50, y=canvas_height-50)
-        self.button3.place(x=350, y=canvas_height-50)
+        self.button2.place(x=250, y=canvas_height-50)
+        self.button3.place(x=450, y=canvas_height-50)
 
         # Bind the buttons to their respective functions
         self.button1.bind("<Button-1>", self.calculate)
+        self.button2.bind("<Button-1>", self.polymomial_reg)
         self.button3.bind("<Button-1>", self.predict)
 
         # Change button color on hover
@@ -54,6 +62,8 @@ class CsvDataView(object):
 
         self.button1.bind("<Enter>", lambda event: change_button_color(self.button1, "#4CAF50"))  # Green color on hover
         self.button1.bind("<Leave>", lambda event: change_button_color(self.button1, "SystemButtonFace"))  # Original color on leave
+        self.button2.bind("<Enter>", lambda event: change_button_color(self.button2, "#4CAF50"))  # Green color on hover
+        self.button2.bind("<Leave>", lambda event: change_button_color(self.button2, "SystemButtonFace"))  # Original color on leave
         self.button3.bind("<Enter>", lambda event: change_button_color(self.button3, "#4CAF50"))  # Green color on hover
         self.button3.bind("<Leave>", lambda event: change_button_color(self.button3, "SystemButtonFace"))  # Original color on leave
 
@@ -68,15 +78,34 @@ class CsvDataView(object):
         if not self.file:
             self.event_logger.addtext("no file to read from")
             return
-        
+        # Iterate over all subplots and remove them
+        for ax in self.fig.axes:
+            ax.remove()
         self.event_logger.addtext("Calculating for "+ self.file)
         self.data_logger.addtext("________________________________________________________")
+        self.reg_type = "linear"
+        self.plot()
+    
+    def polymomial_reg(self, event): 
+
+        if not self.file:
+            self.event_logger.addtext("no file to read from")
+            return
         
+        # Iterate over all subplots and remove them
+        for ax in self.fig.axes:
+            ax.remove()
+
+        self.event_logger.addtext("Calculating for "+ self.file)
+        self.data_logger.addtext("________________________________________________________")
+        self.reg_type = "poly"
         self.plot()
     
 
     def showGraph(self, graph, subplot, title, type, line):
         self.currPlot = self.fig.add_subplot(subplot)
+        
+        
         if type == "scatter":
             self.currPlot.scatter(x =graph[1], y=graph[0], s=1)
         else:
@@ -86,12 +115,17 @@ class CsvDataView(object):
         self.currPlot.set_title(title)
         self.currPlot.set_xlabel(title)
         self.currPlot.set_ylabel(str(self.readBudget.independent_var))
-        
 
         # plot line
-        x_vals = np.array(self.currPlot.get_xlim())
-        y_vals = line["intercept"] + line["slope"] * x_vals
-        self.currPlot.plot(x_vals, y_vals, 'r--')
+        if self.reg_type  == "linear":
+            self.fig.suptitle("Linear Regression Model", fontsize=12)
+            x_vals = np.array(self.currPlot.get_xlim())
+            y_vals = line["intercept"] + line["slope"] * x_vals
+            self.currPlot.plot(x_vals, y_vals, 'r--')
+        if self.reg_type == "poly":
+            self.fig.suptitle("Polynomial Regression Model", fontsize=12)
+            self.currPlot.plot(line[0], line[1], color='red', linewidth=2, label='Polynomial Regression Line')
+
 
         # adjust size to leave room for other graphs
         self.fig.subplots_adjust(left=0.1,
@@ -138,16 +172,34 @@ class CsvDataView(object):
         grid = str(num_rows) + str(num_cols)
 
         for col in self.readBudget.getDependentVar():
-            line  = analyzeBudget.linearRegression(col)
-
-            if not line:
-                self.event_logger.addtext("Could not output graph for column : " + str(col) + "due to calculation error.")
-            else:
-                # self.showGraph([self.readBudget.data[self.readBudget.independent_var], self.readBudget.data[col]], 330+n, col, "scatter", line)
-                pos = grid + str(n)
-                self.showGraph([self.readBudget.data[self.readBudget.independent_var], self.readBudget.data[col]], int(pos), col, "scatter", line)
-                self.textBox(line, col)
+            if self.reg_type == "linear":
+                line  = analyzeBudget.linearRegression(col)
+                if not line:
+                    self.event_logger.addtext("Could not output graph for column : " + str(col) + "due to calculation error.")
+                else:
+                    # self.showGraph([self.readBudget.data[self.readBudget.independent_var], self.readBudget.data[col]], 330+n, col, "scatter", line)
+                    pos = grid + str(n)
+                    self.showGraph([self.readBudget.data[self.readBudget.independent_var], self.readBudget.data[col]], int(pos), col, "scatter", line)
+                    self.textBox(line, col)
                 n+=1
+            if self.reg_type == "poly":
+                output = analyzeBudget.polynomial_regression(col, self.deg)
+                if not output:
+                    self.event_logger.addtext("Could not output graph for column : " + str(col) + " due to calculation error.")
+                else:
+                    # self.showGraph([self.readBudget.data[self.readBudget.independent_var], self.readBudget.data[col]], 330+n, col, "scatter", line)
+                    pos = grid + str(n)
+                    line = [output["x_range"], output["y_pred"]]
+                    self.showGraph([self.readBudget.data[self.readBudget.independent_var], self.readBudget.data[col]], int(pos), col, "scatter", line)
+                    # Keys to exclude from the output
+                    keys_to_exclude = ["x_range", "y_pred"]
+
+                    # Create a new dictionary excluding the specified keys  
+                    show = {key: value for key, value in output.items() if key not in keys_to_exclude}
+                    self.textBox(show, col)
+                n+=1
+
+            
         
 
     def textBox(self, line, col):
@@ -159,7 +211,7 @@ class CsvDataView(object):
             textstr += str(i) + ":" + str(line[i])
             textstr += "\n"
             self.data_logger.addtext(str(i) + ":" + str(line[i]))
-
+    
         self.currPlot.text(0, 0, textstr, fontsize = 8, bbox = dict(facecolor = 'white', alpha = 0.5))
         self.canvas.draw() 
         
@@ -181,7 +233,13 @@ class CsvDataView(object):
             self.data_logger.addtext("Inputed the following variables: "+ str(selected_vars))
             
             analyzeBudget = dataAnalysis(self.readBudget, self.data_logger, self.event_logger)
-            analyzeBudget.predict(selected_vars)
+            
+            if self.reg_type == "linear":
+                analyzeBudget.predict(selected_vars)
+            if self.reg_type == "poly":
+                analyzeBudget.predict_polynomial_reg(selected_vars, self.deg)
+                budget = sum(selected_vars.values())
+                analyzeBudget.recommend_changes_polynomial_reg(selected_vars, self.deg, budget)
         popup = PopupWindow(self.canvas.get_tk_widget())
         popup.open_text_entry(text, variables, handle_done)
 

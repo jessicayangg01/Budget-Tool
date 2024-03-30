@@ -31,6 +31,7 @@ class budgetReader(object):
         self.data_logger.addtext("________________________________________________________ ")
         self.data_logger.addtext("Data cleaning for " + self.filename + "... ")
         
+        
         self.data_logger.addtext(" ")
         self.data_logger.addtext("Taking out None Data")
         old = self.numRows()
