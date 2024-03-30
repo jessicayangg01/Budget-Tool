@@ -25,7 +25,8 @@ class GraphsView(object):
     def __init__(self, window, data_logger, event_logger):
         self.data_logger = data_logger
         self.event_logger = event_logger
-        self.fig = Figure(figsize = (5, 5), dpi = 100) 
+        # self.fig = Figure(figsize = (5, 5), dpi = 100) 
+        self.fig = Figure() 
         
         # creating the Tkinter canvas 
         # containing the Matplotlib figure 

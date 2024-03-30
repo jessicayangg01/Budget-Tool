@@ -30,7 +30,6 @@ class predict(object):
         rf.fit(X_train, y_train)
         y_pred = rf.predict(X_test)
         accuracy = accuracy_score(y_test, y_pred)
-        print("Accuracy:", accuracy)  
         #https://www.statology.org/valueerror-unknown-label-type-continuous/
         # Note that this doesnt work because Sales value is continuous  
 
@@ -60,7 +59,6 @@ class predict(object):
         X2 = sm.add_constant(X)
         est = sm.OLS(Y, X2)
         est2 = est.fit()
-        # print(est2.summary())
         
         
 
