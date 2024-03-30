@@ -9,7 +9,6 @@ class budgetReader(object):
         # self.data.describe()
 
         self.filename = fileName
-        
         self.data_logger = data_logger
         self.data_logger.addtext("Data loaded successfully.")
 
@@ -54,10 +53,14 @@ class budgetReader(object):
                     changeVar[var] = index
                     self.data_logger.addtext(str(var) + " will be assigned to the numeric value of : " +  str(index))
 
-                self.data = self.data.reset_index()
+                # reseting the index
+                self.data = self.data.reset_index(drop=True)
+                # changing data types that are not int into their int values  
                 for val in range(len(self.data[col])):
                     self.data.loc[val, col] = changeVar[self.data[col][val]]
+    
         
+
         self.data_logger.addtext(" ")
         self.data_logger.addtext("Data preview:")
         self.data_logger.addtext(str(self.data))
@@ -67,5 +70,8 @@ class budgetReader(object):
         self.data_logger.addtext("________________________________________________________ ")
 
 
-    def delCol(self, colName):
-        del self.dataDict[colName]
+    #     # drop index
+    #     self.delCol("index")
+
+    # def delCol(self, colName):
+    #     del self.dataDict[colName]

@@ -15,7 +15,8 @@ from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,  NavigationToo
 
 # popup
 from interface.popupWindow import PopupWindow
-import os
+import math
+
 
 
 class CsvDataView(object):
@@ -29,19 +30,10 @@ class CsvDataView(object):
 
         # placing the canvas on the Tkinter window 
         self.canvas.get_tk_widget().pack(fill="both", expand=True)  # Fill the entire window
-        
         self.canvas.get_tk_widget().config(borderwidth=2, relief="solid")
+        
         self.fig.suptitle("Graphs View", fontsize=12)
 
-        # button1 = Button(self.canvas.get_tk_widget(), text="Calculate")
-        # button3 = Button(self.canvas.get_tk_widget(), text="Predict")
-
-        # canvas_height = self.canvas.get_tk_widget().winfo_height()
-        # button1.place(x=50, y=canvas_height-50)
-        # button3.place(x=250, y=canvas_height-50)
-
-        # button3.bind("<Button-1>", self.predict)
-        # button1.bind("<Button-1>", self.calculate)
 
         # Create two Tkinter buttons
         self.button1 = Button(self.canvas.get_tk_widget(), text="Calculate", width=35)
@@ -64,7 +56,6 @@ class CsvDataView(object):
         self.button1.bind("<Leave>", lambda event: change_button_color(self.button1, "SystemButtonFace"))  # Original color on leave
         self.button3.bind("<Enter>", lambda event: change_button_color(self.button3, "#4CAF50"))  # Green color on hover
         self.button3.bind("<Leave>", lambda event: change_button_color(self.button3, "SystemButtonFace"))  # Original color on leave
-
 
 
     def predict(self, event):
@@ -106,7 +97,7 @@ class CsvDataView(object):
         y_vals = line["intercept"] + line["slope"] * x_vals
         self.currPlot.plot(x_vals, y_vals, 'r--')
 
-
+        # adjust size to leave room for other graphs
         self.fig.subplots_adjust(left=0.1,
                     bottom=0.1, 
                     right=0.9, 
@@ -115,7 +106,10 @@ class CsvDataView(object):
                     hspace=0.6)
         
 
-        # self.currPlot.draw()
+        # adjust size to leave room for buttons
+        self.fig.subplots_adjust(bottom=0.2) 
+
+
         self.canvas.draw() 
         
 
@@ -124,9 +118,36 @@ class CsvDataView(object):
     def plot(self):
         n=1
         analyzeBudget = dataAnalysis(self.readBudget, self.data_logger)
-        for col in self.readBudget.getCol():
+
+
+        def calculate_grid_dimensions(numPlots):
+            # Initialize variables to store the best grid dimensions
+            best_rows = 1
+            best_cols = numPlots
+            
+            # Find the factors of numPlots
+            for i in range(2, int(math.sqrt(numPlots)) + 1):
+                if numPlots % i == 0:
+                    rows = i
+                    cols = numPlots // i
+                    
+                    # Update the best grid dimensions if the new dimensions are closer to being square
+                    if abs(cols - rows) < abs(best_cols - best_rows):
+                        best_rows = rows
+                        best_cols = cols
+            
+            return best_rows, best_cols
+
+        num_rows, num_cols = calculate_grid_dimensions(len(self.readBudget.getDependentVar()))
+        grid = str(num_rows) + str(num_cols)
+
+        for col in self.readBudget.getDependentVar():
             line  = analyzeBudget.linearRegression(col)
-            self.showGraph([self.readBudget.data[self.readBudget.independent_var], self.readBudget.data[col]], 330+n, col, "scatter", line)
+            # self.showGraph([self.readBudget.data[self.readBudget.independent_var], self.readBudget.data[col]], 330+n, col, "scatter", line)
+            pos = grid + str(n)
+
+            self.showGraph([self.readBudget.data[self.readBudget.independent_var], self.readBudget.data[col]], int(pos), col, "scatter", line)
+
             self.textBox(line)
             n+=1
         
@@ -160,3 +181,5 @@ class CsvDataView(object):
             analyzeBudget.predict(selected_vars)
         popup = PopupWindow(self.canvas.get_tk_widget())
         popup.open_text_entry(text, variables, handle_done)
+
+    

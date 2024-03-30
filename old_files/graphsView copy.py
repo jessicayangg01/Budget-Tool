@@ -133,7 +133,6 @@ class GraphsView(object):
 
 ### BUTTONS -------------------------------------------
     def calculate(self, event):
-        print("button clicked")
         assets.load_dataFiles()
 
 
