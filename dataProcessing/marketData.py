@@ -119,8 +119,9 @@ class MarketData(object):
     def removeTicker(self, ticker):
         if ticker in self.tickerList:
             del self.tickerList[ticker]
-            del self.plotList[ticker]
             self.data_logger.addtext(f"Removed {ticker} from the ticker list.")
+            if ticker in self.plotList:
+                del self.plotList[ticker]
         else:
             self.data_logger.addtext(f"{ticker} not found in the ticker list.")
     

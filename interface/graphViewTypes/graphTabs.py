@@ -17,6 +17,12 @@ class GraphTabs:
         self.notebook.pack(fill=tk.BOTH, expand=True, padx=10, pady=55)
         self.data_logger = data_logger
 
+        # Configure the style for the notebook
+        self.style = ttk.Style()
+        self.style.theme_use('clam')  # Use the 'clam' theme
+        self.style.configure('TNotebook', background='lightgrey')  # Set background color for the notebook
+        self.style.map('TNotebook.Tab', background=[('selected', 'lightgreen')])  # Set background color for selected tab
+
 
         self.TimeSeries = self.create_graph("Time Series Analysis")
         # self.Correlation = self.create_graph("Correlation Analysis")
@@ -34,6 +40,11 @@ class GraphTabs:
         # Bind the function to the <<NotebookTabChanged>> event
         # self.notebook.bind("<<NotebookTabChanged>>", self.on_tab_change)
     
+    def create_graph(self, title):
+        # Create a new subplot for each tab
+        tab = ttk.Frame(self.notebook)
+        self.notebook.add(tab, text=title)
+        return tab
 
     def update(self, data, ticker):
         self.time_series_add(data, ticker)
@@ -48,12 +59,6 @@ class GraphTabs:
         self.random_forest_reg_add()
         return True
     
-    
-    def create_graph(self, title):
-        # Create a new subplot for each tab
-        tab = ttk.Frame(self.notebook)
-        self.notebook.add(tab, text=title)
-        return tab
     
     def time_series_add(self, data, ticker):
         # Ensure the figure and axes are already created
@@ -83,7 +88,8 @@ class GraphTabs:
         if ticker in self.allPlotLines1:
             self.allPlotLines1[ticker][0].remove()
             del self.allPlotLines1[ticker]  # Remove the plot from the dictionary
-            self.ax1.legend()
+            if self.allPlotLines1:
+                self.ax1.legend()
             self.canvas1.draw()  # Redraw the canvas
             return True
         else:
@@ -93,6 +99,9 @@ class GraphTabs:
 
     def correlation_add(self):
         data = self.stockData.getPlotList("X", "Y")
+        if not data["X"]:
+            return
+
         corr = self.marketDataAnalysis.correlation_analysis(data["X"], data["Y"])
         # Create a new tab
         self.data_logger.addtext("Correlation between all X and Y: " + str(corr))
@@ -129,6 +138,9 @@ class GraphTabs:
         if ticker in self.allPlotLines2:
             self.allPlotLines2[ticker].remove()
             del self.allPlotLines2[ticker]  # Remove the plot from the dictionary
+            self.canvas2.draw()
+            # if not self.allPlotLines2:
+            #     return 
             self.ax2.legend()
             self.caculate_linear_reg()
             self.canvas2.draw()  # Redraw the canvas
@@ -145,6 +157,8 @@ class GraphTabs:
         plotList = self.stockData.getPlotList("X", "Y")
         x = plotList["X"]
         y = plotList["Y"]
+        if not x:
+            return
         data = self.marketDataAnalysis.linearRegression(x, y)
         self.lin_reg_line = self.ax2.plot(x, data.predict(np.array(x).reshape(-1, 1)), color='red', label='Linear regression')
         # Display linear regression results in a text box

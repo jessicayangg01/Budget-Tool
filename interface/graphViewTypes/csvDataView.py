@@ -70,13 +70,9 @@ class CsvDataView(object):
             return
         
         self.event_logger.addtext("Calculating for "+ self.file)
-
+        self.data_logger.addtext("________________________________________________________")
         
-        self.readBudget.dataClean()
-        
-        # analyzeBudget.randomForest()
         self.plot()
-        self.dataanalyze = self.readBudget
     
 
     def showGraph(self, graph, subplot, title, type, line):
@@ -88,8 +84,8 @@ class CsvDataView(object):
         
         # plt.xlabel(title) 
         self.currPlot.set_title(title)
-        self.currPlot.set_xlabel('X Label')
-        self.currPlot.set_ylabel('Y Label')
+        self.currPlot.set_xlabel(title)
+        self.currPlot.set_ylabel(str(self.readBudget.independent_var))
         
 
         # plot line
@@ -117,7 +113,7 @@ class CsvDataView(object):
     
     def plot(self):
         n=1
-        analyzeBudget = dataAnalysis(self.readBudget, self.data_logger)
+        analyzeBudget = dataAnalysis(self.readBudget, self.data_logger, self.event_logger)
 
 
         def calculate_grid_dimensions(numPlots):
@@ -143,23 +139,29 @@ class CsvDataView(object):
 
         for col in self.readBudget.getDependentVar():
             line  = analyzeBudget.linearRegression(col)
-            # self.showGraph([self.readBudget.data[self.readBudget.independent_var], self.readBudget.data[col]], 330+n, col, "scatter", line)
-            pos = grid + str(n)
 
-            self.showGraph([self.readBudget.data[self.readBudget.independent_var], self.readBudget.data[col]], int(pos), col, "scatter", line)
-
-            self.textBox(line)
-            n+=1
+            if not line:
+                self.event_logger.addtext("Could not output graph for column : " + str(col) + "due to calculation error.")
+            else:
+                # self.showGraph([self.readBudget.data[self.readBudget.independent_var], self.readBudget.data[col]], 330+n, col, "scatter", line)
+                pos = grid + str(n)
+                self.showGraph([self.readBudget.data[self.readBudget.independent_var], self.readBudget.data[col]], int(pos), col, "scatter", line)
+                self.textBox(line, col)
+                n+=1
         
 
-    def textBox(self, line):
+    def textBox(self, line, col):
+        self.data_logger.addtext("The following was calculated for " + str(col) + " against " + str(self.readBudget.independent_var))
+
         # show text
         textstr = ""
         for i in line:
             textstr += str(i) + ":" + str(line[i])
             textstr += "\n"
+            self.data_logger.addtext(str(i) + ":" + str(line[i]))
 
         self.currPlot.text(0, 0, textstr, fontsize = 8, bbox = dict(facecolor = 'white', alpha = 0.5))
+        
 
 
     
@@ -177,7 +179,7 @@ class CsvDataView(object):
             # selected_vars = popup.get_selected_variables()
             self.data_logger.addtext("Inputed the following variables: "+ str(selected_vars))
             
-            analyzeBudget = dataAnalysis(self.dataanalyze, self.data_logger)
+            analyzeBudget = dataAnalysis(self.readBudget, self.data_logger, self.event_logger)
             analyzeBudget.predict(selected_vars)
         popup = PopupWindow(self.canvas.get_tk_widget())
         popup.open_text_entry(text, variables, handle_done)

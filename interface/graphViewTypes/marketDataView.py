@@ -75,7 +75,7 @@ class MarketDataView(object):
             self.data_logger.addtext("Inputed the following ticker: " + str(ticker))
 
             if ticker in self.stockData.tickerList:
-                self.data_logger.addtext("ERROR: This ticker already exists in the ticker list. ")
+                self.event_logger.addtext("ERROR: This ticker already exists in the ticker list. ")
                 return
             
             self.stockData.addTicker(ticker)
@@ -86,7 +86,7 @@ class MarketDataView(object):
             
             # Open the popup for selecting the dependent variable (Y)
             if not self.stockData.getIncomeStatement(ticker):
-                self.data_logger.addtext("ERROR: This ticker does not have sufficient financial data to perform analysis. ")
+                self.event_logger.addtext("ERROR: This ticker does not have sufficient financial data to perform analysis. ")
                 self.stockData.removeTicker(ticker)
                 return
             self.open_popup_XY_selection("What is the dependent var?", self.stockData.getIncomeStatement(ticker), handle_Y_selection)

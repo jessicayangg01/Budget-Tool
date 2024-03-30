@@ -10,27 +10,30 @@ import sklearn.metrics as sm
 import pandas as pd
 
 class dataAnalysis(object):
-    def __init__(self, budgetReader, data_logger):
+    def __init__(self, budgetReader, data_logger, event_logger):
         self.budgetReader = budgetReader
         self.data_logger = data_logger
+        self.event_logger = event_logger
 
     
     def linearRegression(self, col):
-        # Y = np.array(self.budgetReader.data["Sales"])
-        Y = np.array(self.budgetReader.data[self.budgetReader.independent_var])
-
-        # predictor
-        X = np.array(self.budgetReader.data[col]).reshape((-1, 1))
-
-        model = LinearRegression().fit(X, Y)
-        values = {}
-        values["slope"] = model.coef_[0]
-        values["intercept"] = model.intercept_
-        values["r squared"] = model.score(X, Y)
-        
-        
-
-        return values
+        try:
+            Y = np.array(self.budgetReader.data[self.budgetReader.independent_var])
+            X = np.array(self.budgetReader.data[col]).reshape((-1, 1))
+            
+            model = LinearRegression().fit(X, Y)
+            
+            values = {}
+            values["slope"] = model.coef_[0]
+            values["intercept"] = model.intercept_
+            values["r squared"] = model.score(X, Y)
+            
+            return values
+            
+        except Exception as e:
+            error_msg = f"Error occurred during linear regression: {str(e)}"
+            self.event_logger.addtext(error_msg)
+            return None
 
     def predict(self, data_given:dict):
         self.data_logger.addtext("___________________________________________________________________")
@@ -49,7 +52,7 @@ class dataAnalysis(object):
             self.data_logger.addtext("Predicted values: {}".format(predicted_values))
         
         except Exception as e:
-            self.data_logger.addtext("An error occurred during prediction: {}".format(str(e)))
+            self.event_logger.addtext("ERROR: An error occurred during prediction: {}".format(str(e)))
             return
 
         
