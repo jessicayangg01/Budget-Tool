@@ -161,6 +161,7 @@ class CsvDataView(object):
             self.data_logger.addtext(str(i) + ":" + str(line[i]))
 
         self.currPlot.text(0, 0, textstr, fontsize = 8, bbox = dict(facecolor = 'white', alpha = 0.5))
+        self.canvas.draw() 
         
 
 

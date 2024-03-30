@@ -1,36 +1,51 @@
 import yfinance as yf
 import pandas as pd
 import numpy as np
+import requests
+
+
 
 class MarketData(object):
-    def __init__(self, data_logger) -> None:
+    def __init__(self, data_logger, event_logger) -> None:
         self.tickerList = {}
         self.data_logger = data_logger
+        self.event_logger = event_logger
         self.plotList = {}
     
 
     def addTicker(self, ticker):
         # Check if the ticker exists
         try:
+
             stock = yf.Ticker(ticker)
             # If the ticker exists, add it to the ticker list
-            self.tickerList[ticker] = stock.income_stmt
+            
             self.data_logger.addtext("____________________________________________________")
-            self.data_logger.addtext(f"Added {ticker} to the ticker list.")
+            self.data_logger.addtext(f"Fetching data for: {ticker}")
 
+            if stock.financials.empty:
+                return False
+            
             company_info = stock.info
+            self.tickerList[ticker] = stock.income_stmt
             # Extracting specific attributes for the summary
+            self.data_logger.addtext(f"Added {ticker} to the ticker list.")
             self.data_logger.addtext("Company Name: " +  company_info.get('longName', 'N/A'))
             self.data_logger.addtext("Industry: " +  company_info.get('industry', 'N/A'))
             self.data_logger.addtext("Sector: " +  company_info.get('sector', 'N/A'))
             self.data_logger.addtext("Country: " +  company_info.get('country', 'N/A'))
             self.data_logger.addtext("Company Website: " +  company_info.get('website', 'N/A'))
             self.data_logger.addtext("____________________________________________________")
-
+            return True
+        except requests.exceptions.HTTPError as e:
+            if e.response.status_code == 404:
+                self.data_logger.addtext(f"Error adding {ticker} to the ticker list: Ticker not found.")
+            else:
+                self.data_logger.addtext(f"Error adding {ticker} to the ticker list: {e}")
         except Exception as e:
             self.data_logger.addtext(f"Error adding {ticker} to the ticker list: {e}")
-    
-
+        return False
+        
     def getIncomeStatement(self, ticker):
         try:
             if ticker in self.tickerList:

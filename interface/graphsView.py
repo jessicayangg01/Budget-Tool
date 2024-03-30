@@ -106,7 +106,7 @@ class GraphsView(object):
         
     
     def marketData(self):
-        self.stockData = MarketData(self.data_logger)
+        self.stockData = MarketData(self.data_logger, self.event_logger)
         self.destroyButtons()
         newMarketDataView = MarketDataView(self.canvas, self.data_logger, self.event_logger, self.stockData, self.fig)
         # self.event_logger.addtext("getting market information ...")
@@ -132,7 +132,7 @@ class GraphsView(object):
             # newCsvDataView = CsvDataView(self.canvas, self.data_logger, self.event_logger, self.file, self.readBudget)
             newCsvDataView = CsvDataView(self.canvas, self.data_logger, self.event_logger, self.file, self.readBudget, self.fig)
         popup = PopupWindow(self.canvas.get_tk_widget())
-        popup.open_variable_list("Select the dependent variable", self.readBudget.getCol(), handle_done)
+        popup.open_selection_list("Select the dependent variable", self.readBudget.getCol(), handle_done)
     
     def clean_data_popup(self):
         def handle_yes():

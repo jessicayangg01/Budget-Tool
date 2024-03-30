@@ -54,16 +54,13 @@ class GraphTabs:
     
     def delete(self, ticker):
         self.time_series_remove(ticker)
-        self.correlation_add()
         self.linear_reg_remove(ticker)
-        self.random_forest_reg_add()
         return True
     
     
     def time_series_add(self, data, ticker):
         # Ensure the figure and axes are already created
         if not hasattr(self, 'fig1') or not hasattr(self, 'ax1'):
-            
             self.fig1, self.ax1 = plt.subplots()
             self.ax1.set_title("Sales over Marketing Budget Trend Over Time")
             self.canvas1 = FigureCanvasTkAgg(self.fig1, master=self.TimeSeries)
@@ -88,8 +85,12 @@ class GraphTabs:
         if ticker in self.allPlotLines1:
             self.allPlotLines1[ticker][0].remove()
             del self.allPlotLines1[ticker]  # Remove the plot from the dictionary
-            if self.allPlotLines1:
-                self.ax1.legend()
+            self.canvas1.draw()
+            if not self.allPlotLines1:
+                self.ax1.clear()
+                self.canvas1.draw()
+                return
+            self.ax1.legend()
             self.canvas1.draw()  # Redraw the canvas
             return True
         else:
@@ -139,8 +140,9 @@ class GraphTabs:
             self.allPlotLines2[ticker].remove()
             del self.allPlotLines2[ticker]  # Remove the plot from the dictionary
             self.canvas2.draw()
-            # if not self.allPlotLines2:
-            #     return 
+            if not self.allPlotLines2:
+                self.ax2.clear()
+                return 
             self.ax2.legend()
             self.caculate_linear_reg()
             self.canvas2.draw()  # Redraw the canvas

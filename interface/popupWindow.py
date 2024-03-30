@@ -65,56 +65,56 @@ class PopupWindow:
 
         self._center_window(popup_window)
     
-    # def open_variable_list(self, text, variables, on_done):
-    #     popup_window = Toplevel()
-    #     popup_window.title("Selection Menu")
-
-    #     label = Label(popup_window, text=text)
-    #     label.pack()
-
-    #     # Create a canvas to contain the checkbuttons
-    #     canvas = Canvas(popup_window)
-    #     canvas.pack(side=LEFT, fill=BOTH, expand=True)
-
-    #     # Add a scrollbar to the canvas
-    #     scrollbar = Scrollbar(popup_window, orient=VERTICAL, command=canvas.yview)
-    #     scrollbar.pack(side=RIGHT, fill=Y)
-    #     canvas.config(yscrollcommand=scrollbar.set)
-
-    #     # Create a frame to hold the checkbuttons
-    #     frame = Frame(canvas)
-    #     canvas.create_window((0, 0), window=frame, anchor='nw')
-
-    #     checkbox_vars = []
-    #     for var in variables:
-    #         var_checkbox = IntVar(value=0)
-    #         checkbox_vars.append(var_checkbox)
-    #         checkbox = Checkbutton(frame, text=var, variable=var_checkbox)
-    #         checkbox.pack()
-
-    #     # Update scroll region after widgets are packed
-    #     frame.update_idletasks()
-    #     canvas.config(scrollregion=canvas.bbox("all"))
-
-    #     # Move the "Done" button to the bottom of the popup window
-    #     button_done = Button(popup_window, text="Done", command=lambda: self._get_selected_variables(checkbox_vars, variables, popup_window, on_done))
-    #     button_done.pack(side='bottom')
-
-    #     # Bind mouse wheel scrolling to the canvas
-    #     # canvas.bind_all("<MouseWheel>", lambda event: self._on_mousewheel(event, canvas))
-
-    #     self._center_window(popup_window)
-        
-    # def _get_selected_variables(self, checkbox_vars, variables, window, on_done):
-    #     self.selected_variables.clear()
-    #     for var, var_checkbox in zip(variables, checkbox_vars):
-    #         if var_checkbox.get() == 1:
-    #             self.selected_variables.append(var)
-        
-    #     on_done(self.selected_variables)
-    #     window.destroy()
-        
     def open_variable_list(self, text, variables, on_done):
+        popup_window = Toplevel()
+        popup_window.title("Selection Menu")
+
+        label = Label(popup_window, text=text)
+        label.pack()
+
+        # Create a canvas to contain the checkbuttons
+        canvas = Canvas(popup_window)
+        canvas.pack(side=LEFT, fill=BOTH, expand=True)
+
+        # Add a scrollbar to the canvas
+        scrollbar = Scrollbar(popup_window, orient=VERTICAL, command=canvas.yview)
+        scrollbar.pack(side=RIGHT, fill=Y)
+        canvas.config(yscrollcommand=scrollbar.set)
+
+        # Create a frame to hold the checkbuttons
+        frame = Frame(canvas)
+        canvas.create_window((0, 0), window=frame, anchor='nw')
+
+        checkbox_vars = []
+        for var in variables:
+            var_checkbox = IntVar(value=0)
+            checkbox_vars.append(var_checkbox)
+            checkbox = Checkbutton(frame, text=var, variable=var_checkbox)
+            checkbox.pack()
+
+        # Update scroll region after widgets are packed
+        frame.update_idletasks()
+        canvas.config(scrollregion=canvas.bbox("all"))
+
+        # Move the "Done" button to the bottom of the popup window
+        button_done = Button(popup_window, text="Done", command=lambda: self._get_selected_variables(checkbox_vars, variables, popup_window, on_done))
+        button_done.pack(side='bottom')
+
+        # Bind mouse wheel scrolling to the canvas
+        # canvas.bind_all("<MouseWheel>", lambda event: self._on_mousewheel(event, canvas))
+
+        self._center_window(popup_window)
+        
+    def _get_selected_variables(self, checkbox_vars, variables, window, on_done):
+        self.selected_variables.clear()
+        for var, var_checkbox in zip(variables, checkbox_vars):
+            if var_checkbox.get() == 1:
+                self.selected_variables.append(var)
+        
+        on_done(self.selected_variables)
+        window.destroy()
+        
+    def open_selection_list(self, text, variables, on_done):
         popup_window = Toplevel()
         popup_window.title("Selection Menu")
 
