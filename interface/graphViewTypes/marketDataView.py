@@ -72,24 +72,26 @@ class MarketDataView(object):
     def open_popup_ticker_entry(self, text):
         # Create and open the popup window
         def handle_X_selection(ticker):
-            self.data_logger.addtext("Inputed the following ticker: " + str(ticker))
+            self.event_logger.addtext("Searching in the Yahoo Finance database for the following ticker: " + str(ticker))
 
             if ticker in self.stockData.tickerList:
-                self.data_logger.addtext("ERROR: This ticker already exists in the ticker list. ")
+                self.event_logger.addtext("ERROR: This ticker already exists in the ticker list. ")
                 return
             
-            self.stockData.addTicker(ticker)
+            if not self.stockData.addTicker(ticker):
+                self.event_logger.addtext(f"ERROR: The ticker {ticker} does not exist in the database.")
+                return
 
             # Define a callback function to handle X and Y selections
             def handle_Y_selection(Y):
-                X = self.open_popup_XY_selection("What is the independent var?", self.stockData.getIncomeStatement(ticker), lambda X: self.handle_XY_selection(X, Y, ticker))
+                X = self.open_popup_XY_selection("What is the independent var?", self.stockData.getIncomeStatement(ticker), lambda X: self.handle_XY_selection(X, Y, ticker), ticker)
             
             # Open the popup for selecting the dependent variable (Y)
             if not self.stockData.getIncomeStatement(ticker):
-                self.data_logger.addtext("ERROR: This ticker does not have sufficient financial data to perform analysis. ")
+                self.event_logger.addtext("ERROR: This ticker does not have sufficient financial data to perform analysis. ")
                 self.stockData.removeTicker(ticker)
                 return
-            self.open_popup_XY_selection("What is the dependent var?", self.stockData.getIncomeStatement(ticker), handle_Y_selection)
+            self.open_popup_XY_selection("What is the dependent var?", self.stockData.getIncomeStatement(ticker), handle_Y_selection, ticker)
 
         popup = PopupWindow(self.canvas.get_tk_widget())
         popup.open_ticker_entry(text, handle_X_selection)
@@ -98,14 +100,17 @@ class MarketDataView(object):
         data = self.stockData.getVars(ticker, Y, X)
         self.graphsTabs.update(data, ticker)
     
-    def open_popup_XY_selection(self, text, vars, callback):
+    def open_popup_XY_selection(self, text, vars, callback, ticker):
         # Create and open the popup window
         def handle_done2(data):
-            one_data = data[0]  # Assuming data is a tuple or list containing X and Y
-            self.data_logger.addtext("Using Var: " + str(one_data))
-            callback(one_data)  # Pass the selected data to the callback function
+            if not data:
+                self.event_logger.addtext("ERROR: Failed to select a variable.")
+                self.stockData.removeTicker(ticker)
+                return
+            self.data_logger.addtext("Using Var: " + str(data))
+            callback(data)  # Pass the selected data to the callback function
         popup = PopupWindow(self.canvas.get_tk_widget())
-        popup.open_variable_list(text, vars, handle_done2)
+        popup.open_selection_list(text, vars, handle_done2)
     
 
         
@@ -122,6 +127,7 @@ class MarketDataView(object):
             for i in data:
                 self.stockData.removeTicker(i)
                 self.graphsTabs.delete(i)
+            self.graphsTabs.random_forest_reg_add()
 
         popup = PopupWindow(self.canvas.get_tk_widget())
         popup.open_variable_list(text, tickers, handle_done)

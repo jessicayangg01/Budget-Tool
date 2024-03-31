@@ -1,7 +1,8 @@
 #### NEW POP UP --------------------------------------------
-from tkinter import Button, Toplevel, Label, Entry, Checkbutton, IntVar, Text
-from tkinter import Tk, Frame, Toplevel, Label, Checkbutton, Button, Canvas, Scrollbar, IntVar, Y, LEFT, RIGHT, BOTTOM, BOTH, VERTICAL
-
+from tkinter import (
+    Tk, Frame, Toplevel, Label, Button, Entry, Checkbutton, Canvas, 
+    Scrollbar, IntVar, StringVar, Text, Radiobutton, LEFT, RIGHT, BOTTOM, BOTH, VERTICAL, Y
+)
 
 class PopupWindow:
     def __init__(self, canvas):
@@ -11,7 +12,7 @@ class PopupWindow:
 
     def open_text_entry(self, text, variables, on_enter):
         popup_window = Toplevel()
-        popup_window.title("Text Entry")
+        popup_window.title("Data Entry")
 
         label = Label(popup_window, text=text)
         label.pack()
@@ -46,7 +47,6 @@ class PopupWindow:
                 text_entries[prompt] = 0
 
         
-        print(text_entries)
         on_enter(text_entries)
         window.destroy()
     
@@ -65,28 +65,9 @@ class PopupWindow:
 
         self._center_window(popup_window)
     
-    # def open_variable_list(self, text, variables, on_done):
-    #     popup_window = Toplevel()
-    #     popup_window.title("Select Menu")
-
-    #     label = Label(popup_window, text=text)
-    #     label.pack()
-
-    #     checkbox_vars = []
-    #     for var in variables:
-    #         var_checkbox = IntVar(value=0)
-    #         checkbox_vars.append(var_checkbox)
-    #         checkbox = Checkbutton(popup_window, text=var, variable=var_checkbox)
-    #         checkbox.pack()
-
-    #     button_done = Button(popup_window, text="Done", command=lambda: self._get_selected_variables(checkbox_vars, variables, popup_window, on_done))
-    #     button_done.pack()
-
-    #     self._center_window(popup_window)
-    
     def open_variable_list(self, text, variables, on_done):
         popup_window = Toplevel()
-        popup_window.title("Select Menu")
+        popup_window.title("Selection Menu")
 
         label = Label(popup_window, text=text)
         label.pack()
@@ -123,7 +104,7 @@ class PopupWindow:
         # canvas.bind_all("<MouseWheel>", lambda event: self._on_mousewheel(event, canvas))
 
         self._center_window(popup_window)
-
+        
     def _get_selected_variables(self, checkbox_vars, variables, window, on_done):
         self.selected_variables.clear()
         for var, var_checkbox in zip(variables, checkbox_vars):
@@ -132,19 +113,67 @@ class PopupWindow:
         
         on_done(self.selected_variables)
         window.destroy()
+        
+    def open_selection_list(self, text, variables, on_done):
+        popup_window = Toplevel()
+        popup_window.title("Selection Menu")
+
+        label = Label(popup_window, text=text)
+        label.pack()
+
+        # Create a canvas to contain the radio buttons
+        canvas = Canvas(popup_window)
+        canvas.pack(side=LEFT, fill=BOTH, expand=True)
+
+        # Add a scrollbar to the canvas
+        scrollbar = Scrollbar(popup_window, orient=VERTICAL, command=canvas.yview)
+        scrollbar.pack(side=RIGHT, fill=Y)
+        canvas.config(yscrollcommand=scrollbar.set)
+
+        # Create a frame to hold the radio buttons
+        frame = Frame(canvas)
+        canvas.create_window((0, 0), window=frame, anchor='nw')
+
+        # Variable to track the selected option
+        selected_option = StringVar()
+
+        # List to store the Radiobutton objects
+        radio_buttons = []
+
+        for var in variables:
+            radio_button = Radiobutton(frame, text=var, variable=selected_option, value=var)
+            radio_button.pack()
+            radio_buttons.append(radio_button)
+
+        # Function to get the selected variable
+        def get_selected_variable():
+            selected_var = selected_option.get()
+            popup_window.destroy()  # Close the popup window
+            on_done(selected_var)  # Pass the selected variable to the callback function
+
+        # Create a "Done" button to get the selected variable
+        button_done = Button(popup_window, text="Done", command=get_selected_variable)
+        button_done.pack(side='bottom')
+
+        # Update scroll region after widgets are packed
+        self._center_window(popup_window)
+
 
     
     def open_text_yes_no(self, text, on_yes, on_no):
+        def close_window():
+            popup_window.destroy()
+
         popup_window = Toplevel()
         popup_window.title("Select Menu")
 
         label = Label(popup_window, text=text)
         label.pack()
 
-        button_yes = Button(popup_window, text="Yes", command=on_yes)
+        button_yes = Button(popup_window, text="Yes", command=lambda: [on_yes(), close_window()])
         button_yes.pack(side="left")
 
-        button_no = Button(popup_window, text="No", command=on_no)
+        button_no = Button(popup_window, text="No", command=lambda: [on_no(), close_window()])
         button_no.pack(side="left")
 
         self._center_window(popup_window)
@@ -179,3 +208,4 @@ class PopupWindow:
         canvas_width = self.canvas.winfo_width()
         canvas_height = self.canvas.winfo_height()
         window.geometry(f"+{canvas_width // 2}+{canvas_height // 2}")
+        window.attributes("-topmost", True)

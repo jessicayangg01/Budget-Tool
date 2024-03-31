@@ -20,7 +20,7 @@ class EventLogger(Frame):
         label_left.grid(row=0, column=0, sticky="w", padx=(5, 0))
 
         # Add a text widget on the top-left side
-        self.text_left = Text(self, font=("Georgia", 10), yscrollcommand=v.set)
+        self.text_left = Text(self, font=("Georgia", 10), yscrollcommand=v.set, fg="blue")
         self.text_left.grid(row=1, column=0, padx=(5, 0), pady=(0, 0), sticky="nsew")  # Set padx and pady to 0
 
         # Attach the scrollbar with the left text widget
