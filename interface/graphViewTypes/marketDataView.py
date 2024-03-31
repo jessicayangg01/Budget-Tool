@@ -84,14 +84,14 @@ class MarketDataView(object):
 
             # Define a callback function to handle X and Y selections
             def handle_Y_selection(Y):
-                X = self.open_popup_XY_selection("What is the independent var?", self.stockData.getIncomeStatement(ticker), lambda X: self.handle_XY_selection(X, Y, ticker), ticker)
+                X = self.open_popup_XY_selection("What is the independent var? (Suggest: Marketing Expense Data)", self.stockData.getIncomeStatement(ticker), lambda X: self.handle_XY_selection(X, Y, ticker), ticker)
             
             # Open the popup for selecting the dependent variable (Y)
             if not self.stockData.getIncomeStatement(ticker):
                 self.event_logger.addtext("ERROR: This ticker does not have sufficient financial data to perform analysis. ")
                 self.stockData.removeTicker(ticker)
                 return
-            self.open_popup_XY_selection("What is the dependent var?", self.stockData.getIncomeStatement(ticker), handle_Y_selection, ticker)
+            self.open_popup_XY_selection("What is the dependent var? (Suggest: Sales or Revenue Data)", self.stockData.getIncomeStatement(ticker), handle_Y_selection, ticker)
 
         popup = PopupWindow(self.canvas.get_tk_widget())
         popup.open_ticker_entry(text, handle_X_selection)
