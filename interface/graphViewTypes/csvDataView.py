@@ -103,7 +103,8 @@ class CsvDataView(object):
     
 
     def showGraph(self, graph, subplot, title, type, line):
-        self.currPlot = self.fig.add_subplot(subplot)
+        # self.currPlot = self.fig.add_subplot(subplot)
+        self.currPlot = self.fig.add_subplot(subplot[0], subplot[1], subplot[2])
         
         
         if type == "scatter":
@@ -124,7 +125,7 @@ class CsvDataView(object):
             self.currPlot.plot(x_vals, y_vals, 'r--')
         if self.reg_type == "poly":
             self.fig.suptitle("Polynomial Regression Model", fontsize=12)
-            self.currPlot.plot(line[0], line[1], color='red', linewidth=2, label='Polynomial Regression Line')
+            self.currPlot.plot(line[0], line[1], color='red', linewidth=1, label='Polynomial Regression Line')
 
 
         # adjust size to leave room for other graphs
@@ -151,25 +152,26 @@ class CsvDataView(object):
 
 
         def calculate_grid_dimensions(numPlots):
-            # Initialize variables to store the best grid dimensions
+            # Initialize variables to store the best grid dimensions and the minimum difference
+            best_diff = float('inf')
             best_rows = 1
             best_cols = numPlots
             
-            # Find the factors of numPlots
-            for i in range(2, int(math.sqrt(numPlots)) + 1):
-                if numPlots % i == 0:
-                    rows = i
-                    cols = numPlots // i
-                    
-                    # Update the best grid dimensions if the new dimensions are closer to being square
-                    if abs(cols - rows) < abs(best_cols - best_rows):
-                        best_rows = rows
-                        best_cols = cols
+            # Iterate through all possible combinations of rows and columns
+            for rows in range(1, numPlots + 1):
+                cols = math.ceil(numPlots / rows)
+                total_plots = rows * cols
+                
+                # Update the best grid dimensions if it fits all the plots and minimizes the difference
+                if total_plots >= numPlots and abs(rows - cols) < best_diff:
+                    best_diff = abs(rows - cols)
+                    best_rows = rows
+                    best_cols = cols
             
             return best_rows, best_cols
 
         num_rows, num_cols = calculate_grid_dimensions(len(self.readBudget.getDependentVar()))
-        grid = str(num_rows) + str(num_cols)
+        grid = [num_rows, num_cols, 0]
 
         for col in self.readBudget.getDependentVar():
             if self.reg_type == "linear":
@@ -178,8 +180,8 @@ class CsvDataView(object):
                     self.event_logger.addtext("Could not output graph for column : " + str(col) + "due to calculation error.")
                 else:
                     # self.showGraph([self.readBudget.data[self.readBudget.independent_var], self.readBudget.data[col]], 330+n, col, "scatter", line)
-                    pos = grid + str(n)
-                    self.showGraph([self.readBudget.data[self.readBudget.independent_var], self.readBudget.data[col]], int(pos), col, "scatter", line)
+                    grid[2] = n
+                    self.showGraph([self.readBudget.data[self.readBudget.independent_var], self.readBudget.data[col]], grid, col, "scatter", line)
                     self.textBox(line, col)
                 n+=1
             if self.reg_type == "poly":
@@ -188,9 +190,9 @@ class CsvDataView(object):
                     self.event_logger.addtext("Could not output graph for column : " + str(col) + " due to calculation error.")
                 else:
                     # self.showGraph([self.readBudget.data[self.readBudget.independent_var], self.readBudget.data[col]], 330+n, col, "scatter", line)
-                    pos = grid + str(n)
+                    grid[2] = n
                     line = [output["x_range"], output["y_pred"]]
-                    self.showGraph([self.readBudget.data[self.readBudget.independent_var], self.readBudget.data[col]], int(pos), col, "scatter", line)
+                    self.showGraph([self.readBudget.data[self.readBudget.independent_var], self.readBudget.data[col]], grid, col, "scatter", line)
                     # Keys to exclude from the output
                     keys_to_exclude = ["x_range", "y_pred"]
 
@@ -202,19 +204,36 @@ class CsvDataView(object):
             
         
 
+    # def textBox(self, line, col):
+    #     self.data_logger.addtext("The following was calculated for " + str(col) + " against " + str(self.readBudget.independent_var))
+
+    #     # show text
+    #     textstr = ""
+    #     for i in line:
+    #         textstr += str(i) + ":" + str(line[i])
+    #         textstr += "\n"
+    #         self.data_logger.addtext(str(i) + ":" + str(line[i]))
+    
+    #     self.currPlot.text(0, 0, textstr, fontsize = 8, bbox = dict(facecolor = 'white', alpha = 0.5))
+    #     self.canvas.draw() 
     def textBox(self, line, col):
         self.data_logger.addtext("The following was calculated for " + str(col) + " against " + str(self.readBudget.independent_var))
 
-        # show text
+        # Create text string
         textstr = ""
         for i in line:
             textstr += str(i) + ":" + str(line[i])
             textstr += "\n"
             self.data_logger.addtext(str(i) + ":" + str(line[i]))
-    
-        self.currPlot.text(0, 0, textstr, fontsize = 8, bbox = dict(facecolor = 'white', alpha = 0.5))
+
+        # Position the text box on the top right corner
+        x_pos = 0.95  # Adjust the x-coordinate to position the text box horizontally
+        y_pos = 0.95  # Adjust the y-coordinate to position the text box vertically
+
+        self.currPlot.text(x_pos, y_pos, textstr, fontsize=8, bbox=dict(facecolor='white', alpha=0.5),
+                            horizontalalignment='right', verticalalignment='top', transform=self.currPlot.transAxes)
         self.canvas.draw() 
-        
+            
 
 
     
