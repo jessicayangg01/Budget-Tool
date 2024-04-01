@@ -256,9 +256,10 @@ class CsvDataView(object):
             if self.reg_type == "linear":
                 analyzeBudget.predict(selected_vars)
             if self.reg_type == "poly":
-                analyzeBudget.predict_polynomial_reg(selected_vars, self.deg)
+                predicted_values =analyzeBudget.predict_polynomial_reg(selected_vars, self.deg)
                 budget = sum(selected_vars.values())
-                analyzeBudget.recommend_changes_polynomial_reg(selected_vars, self.deg, budget)
+                # analyzeBudget.recommend_changes_polynomial_reg(budget, selected_vars, self.deg)
+                # analyzeBudget.polynomial_regression_optimization(budget, self.deg)
         popup = PopupWindow(self.canvas.get_tk_widget())
         popup.open_text_entry(text, variables, handle_done)
 
