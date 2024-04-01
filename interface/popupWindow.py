@@ -3,6 +3,8 @@ from tkinter import (
     Tk, Frame, Toplevel, Label, Button, Entry, Checkbutton, Canvas, 
     Scrollbar, IntVar, StringVar, Text, Radiobutton, LEFT, RIGHT, BOTTOM, BOTH, VERTICAL, Y
 )
+import tkinter as tk
+
 
 class PopupWindow:
     def __init__(self, canvas):
@@ -145,6 +147,10 @@ class PopupWindow:
             radio_button.pack()
             radio_buttons.append(radio_button)
 
+        # Update scroll region after widgets are packed
+        frame.update_idletasks()
+        canvas.config(scrollregion=canvas.bbox("all"))
+
         # Function to get the selected variable
         def get_selected_variable():
             selected_var = selected_option.get()
@@ -155,8 +161,82 @@ class PopupWindow:
         button_done = Button(popup_window, text="Done", command=get_selected_variable)
         button_done.pack(side='bottom')
 
-        # Update scroll region after widgets are packed
+        def _on_mousewheel(event, canvas):
+            try:
+                canvas.yview_scroll(-1 * int(event.delta / 120), "units")
+            except tk.TclError:
+                pass  # Do nothing if there's an error
+      
+        # Bind mouse wheel scrolling to the canvas
+        canvas.bind_all("<MouseWheel>", lambda event: _on_mousewheel(event, canvas))
+
         self._center_window(popup_window)
+        
+    # def open_selection_list(self, text, variables, on_done):
+    #     # Function to handle mouse wheel scrolling on the canvas
+    #     def _on_mousewheel(event, canvas):
+    #         canvas.yview_scroll(-1 * int(event.delta / 120), "units")
+
+    #     # Function to unbind mouse wheel scrolling
+    #     def disable_mousewheel_scroll():
+    #         canvas.unbind_all("<MouseWheel>")
+
+    #     # Function to bind mouse wheel scrolling
+    #     def enable_mousewheel_scroll():
+    #         canvas.bind_all("<MouseWheel>", lambda event: _on_mousewheel(event, canvas))
+
+    #     # Create the popup window
+    #     popup_window = Toplevel()
+    #     popup_window.title("Selection Menu")
+
+    #     # Create a label for the popup window
+    #     label = Label(popup_window, text=text)
+    #     label.pack()
+
+    #     # Create a canvas to contain the radio buttons
+    #     canvas = Canvas(popup_window)
+    #     canvas.pack(side=LEFT, fill=BOTH, expand=True)
+
+    #     # Add a scrollbar to the canvas
+    #     scrollbar = Scrollbar(popup_window, orient=VERTICAL, command=canvas.yview)
+    #     scrollbar.pack(side=RIGHT, fill=Y)
+    #     canvas.config(yscrollcommand=scrollbar.set)
+
+    #     # Create a frame to hold the radio buttons
+    #     frame = Frame(canvas)
+    #     canvas.create_window((0, 0), window=frame, anchor='nw')
+
+    #     # Variable to track the selected option
+    #     selected_option = StringVar()
+
+    #     # List to store the Radiobutton objects
+    #     radio_buttons = []
+
+    #     for var in variables:
+    #         radio_button = Radiobutton(frame, text=var, variable=selected_option, value=var)
+    #         radio_button.pack()
+    #         radio_buttons.append(radio_button)
+
+    #     # Update scroll region after widgets are packed
+    #     frame.update_idletasks()
+    #     canvas.config(scrollregion=canvas.bbox("all"))
+
+    #     # Function to get the selected variable
+    #     def get_selected_variable():
+    #         selected_var = selected_option.get()
+    #         popup_window.destroy()  # Close the popup window
+    #         on_done(selected_var)  # Pass the selected variable to the callback function
+    #         disable_mousewheel_scroll()  # Disable mouse wheel scrolling when the popup is closed
+
+    #     # Create a "Done" button to get the selected variable
+    #     button_done = Button(popup_window, text="Done", command=get_selected_variable)
+    #     button_done.pack(side='bottom')
+
+    #     # Bind mouse wheel scrolling to the canvas
+    #     enable_mousewheel_scroll()
+
+    #     # Center the popup window
+    #     self._center_window(popup_window)
 
 
     

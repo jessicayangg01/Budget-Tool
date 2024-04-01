@@ -63,6 +63,8 @@ class GraphTabs:
         if not hasattr(self, 'fig1') or not hasattr(self, 'ax1'):
             self.fig1, self.ax1 = plt.subplots()
             self.ax1.set_title("Sales over Marketing Budget Trend Over Time")
+            self.ax1.set_xlabel('Year')
+            self.ax1.set_ylabel('Sales/Marketing Expense Ratio')
             self.canvas1 = FigureCanvasTkAgg(self.fig1, master=self.TimeSeries)
             self.canvas1.get_tk_widget().pack(fill=tk.BOTH, expand=True)
 
@@ -118,6 +120,8 @@ class GraphTabs:
         if not hasattr(self, 'fig2') or not hasattr(self, 'ax2'): 
             self.fig2, self.ax2 = plt.subplots()
             self.ax2.set_title("Sales over Marketing")
+            self.ax2.set_xlabel('Marketing Expense')
+            self.ax2.set_ylabel('Sales')
             self.canvas2 = FigureCanvasTkAgg(self.fig2, master=self.Reg)
             self.canvas2.get_tk_widget().pack(fill=tk.BOTH, expand=True)
 

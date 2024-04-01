@@ -216,6 +216,62 @@ class dataAnalysis(object):
         
     
 
+    # def recommend_changes_polynomial_reg(self, data_given: dict, deg, budget):
+    #     try:
+    #         # Predict sales based on the provided independent variables
+    #         predicted_sales = self.predict_polynomial_reg(data_given, deg)
+
+    #         # Calculate the contributions of each independent variable to the predicted sales
+    #         contributions = {}
+    #         for col in data_given:
+    #             # Increment the value of the independent variable by a small amount
+    #             data_given_incremented = data_given.copy()
+    #             data_given_incremented[col] += 1  # Adjust the increment value as needed
+
+    #             # Ensure that the incremented value is non-negative
+    #             if data_given_incremented[col] < 0:
+    #                 data_given_incremented[col] = 0
+
+    #             # Predict sales with the incremented value of the independent variable
+    #             predicted_sales_incremented = self.predict_polynomial_reg(data_given_incremented, deg)
+
+    #             # Calculate the contribution of the variable
+    #             contribution = predicted_sales_incremented - predicted_sales
+    #             contributions[col] = contribution
+
+    #         # Normalize contributions to sum up to the budget
+    #         total_contribution = sum(contributions.values())
+    #         normalized_contributions = {col: (contribution / total_contribution) * budget for col, contribution in contributions.items()}
+
+    #         # Calculate the new predicted sales value
+    #         new_predicted_sales = predicted_sales + total_contribution
+
+    #         # Log the recommendations
+    #         self.data_logger.addtext("___________________________________________________________________")
+    #         self.data_logger.addtext("")
+    #         self.data_logger.addtext("Recommendations for Budget Allocation:")
+    #         self.data_logger.addtext("")
+
+    #         for col, allocation in normalized_contributions.items():
+    #             self.data_logger.addtext(f"{col}: {allocation}")
+
+    #         self.data_logger.addtext("This will give you a " + str(self.budgetReader.independent_var) + " value of : " + str(new_predicted_sales))
+    #         self.data_logger.addtext("Which is a " + str(total_contribution) + " increase from the previous value of " + str(predicted_sales))
+
+    #         # Calculate the percentage increase
+    #         percentage_increase = (total_contribution / predicted_sales) * 100
+    #         # Convert percentage_increase to a scalar value if it's a numpy array
+    #         percentage_increase_scalar = percentage_increase.item() if isinstance(percentage_increase, np.ndarray) else percentage_increase
+    #         # Convert percentage_increase to a string with two decimal places
+    #         percentage_increase_str = "{:.2f}%".format(percentage_increase_scalar)
+    #         # Log the percentage increase
+    #         self.data_logger.addtext("Percentage Increase: " + percentage_increase_str)
+
+    #         return normalized_contributions
+
+    #     except Exception as e:
+    #         self.event_logger.addtext("ERROR: An error occurred during recommendation: {}".format(str(e)))
+    
     def recommend_changes_polynomial_reg(self, data_given: dict, deg, budget):
         try:
             # Predict sales based on the provided independent variables
@@ -242,6 +298,14 @@ class dataAnalysis(object):
             # Normalize contributions to sum up to the budget
             total_contribution = sum(contributions.values())
             normalized_contributions = {col: (contribution / total_contribution) * budget for col, contribution in contributions.items()}
+
+            # Check if any contribution is negative and adjust it to zero
+            for col, allocation in normalized_contributions.items():
+                if allocation < 0:
+                    normalized_contributions[col] = 0
+
+            # Recalculate total_contribution after adjusting negative contributions
+            total_contribution = sum(normalized_contributions.values())
 
             # Calculate the new predicted sales value
             new_predicted_sales = predicted_sales + total_contribution
