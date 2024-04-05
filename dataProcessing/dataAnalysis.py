@@ -15,6 +15,9 @@ import numpy as np
 import sklearn.metrics as sm
 import pandas as pd
 
+from dataProcessing.polynomialRegOptimizer import PolynomialRegressionOptimizer
+from scipy.optimize import minimize
+
 class dataAnalysis(object):
     def __init__(self, budgetReader, data_logger, event_logger):
         self.budgetReader = budgetReader
@@ -143,6 +146,53 @@ class dataAnalysis(object):
             return None
     
 
+    # def predict_polynomial_reg(self, data_given: dict, deg: int):
+    #     self.data_logger.addtext("___________________________________________________________________")
+    #     self.data_logger.addtext("")
+    #     self.data_logger.addtext("POLYNOMIAL REGRESSION PREDICTION:")
+    #     self.data_logger.addtext("")
+    #     self.data_logger.addtext("Predicting for values...")
+    #     self.data_logger.addtext(str(data_given))
+
+    #     try:
+    #         # Extract independent and dependent variables from the dataset
+    #         X_train = self.budgetReader.data.drop(columns=[self.budgetReader.independent_var])
+    #         y_train = self.budgetReader.data[self.budgetReader.independent_var]
+
+    #         # Transform the independent variables into polynomial features
+    #         poly_features = PolynomialFeatures(degree=deg)
+    #         X_train_poly = poly_features.fit_transform(X_train)
+
+    #         # Fit the polynomial regression model
+    #         model = LinearRegression().fit(X_train_poly, y_train)
+
+    #         # Prepare the input data for prediction
+    #         df = pd.DataFrame(data_given, index=[0])
+    #         df_poly = poly_features.transform(df)
+
+    #         # Make predictions
+    #         predicted_values = model.predict(df_poly)
+
+    #         # Log the predicted values
+    #         self.data_logger.addtext("Predicted values: {}".format(predicted_values))
+
+    #         # Log the predicted value of the dependent variable
+    #         self.data_logger.addtext("Here is the predicted value of your dependent variable given the independent variables you provided:")
+    #         self.data_logger.addtext("- - - - - - - - - - - ")
+    #         self.data_logger.addtext(str(predicted_values))
+    #         self.data_logger.addtext("- - - - - - - - - - - ")
+
+            
+    #         self.evaluate_polynomial_reg(0.2, deg)
+
+
+    #         ## ADDED
+    #         return predicted_values
+
+    #     except Exception as e:
+    #         self.event_logger.addtext("ERROR: An error occurred during prediction: {}".format(str(e)))
+        
+        
     def predict_polynomial_reg(self, data_given: dict, deg: int):
         self.data_logger.addtext("___________________________________________________________________")
         self.data_logger.addtext("")
@@ -151,43 +201,44 @@ class dataAnalysis(object):
         self.data_logger.addtext("Predicting for values...")
         self.data_logger.addtext(str(data_given))
 
-        try:
             # Extract independent and dependent variables from the dataset
-            X_train = self.budgetReader.data.drop(columns=[self.budgetReader.independent_var])
-            y_train = self.budgetReader.data[self.budgetReader.independent_var]
+        X_train = self.budgetReader.data.drop(columns=[self.budgetReader.independent_var])
+        y_train = self.budgetReader.data[self.budgetReader.independent_var]
 
             # Transform the independent variables into polynomial features
-            poly_features = PolynomialFeatures(degree=deg)
-            X_train_poly = poly_features.fit_transform(X_train)
+        poly_features = PolynomialFeatures(degree=deg)
+        X_train_poly = poly_features.fit_transform(X_train)
 
             # Fit the polynomial regression model
-            model = LinearRegression().fit(X_train_poly, y_train)
+        model = LinearRegression().fit(X_train_poly, y_train)
 
             # Prepare the input data for prediction
-            df = pd.DataFrame(data_given, index=[0])
-            df_poly = poly_features.transform(df)
+        df = pd.DataFrame(data_given, index=[0])
+        df_poly = poly_features.transform(df)
 
             # Make predictions
-            predicted_values = model.predict(df_poly)
+        predicted_values = model.predict(df_poly)
 
             # Log the predicted values
-            self.data_logger.addtext("Predicted values: {}".format(predicted_values))
+        self.data_logger.addtext("Predicted values: {}".format(predicted_values))
 
             # Log the predicted value of the dependent variable
-            self.data_logger.addtext("Here is the predicted value of your dependent variable given the independent variables you provided:")
-            self.data_logger.addtext("- - - - - - - - - - - ")
-            self.data_logger.addtext(str(predicted_values))
-            self.data_logger.addtext("- - - - - - - - - - - ")
+        self.data_logger.addtext("Here is the predicted value of your dependent variable given the independent variables you provided:")
+        self.data_logger.addtext("- - - - - - - - - - - ")
+        self.data_logger.addtext(str(predicted_values))
+        self.data_logger.addtext("- - - - - - - - - - - ")
 
             
-            self.evaluate_polynomial_reg(0.2, deg)
-            return predicted_values
+        self.evaluate_polynomial_reg(0.2, deg)
 
-        except Exception as e:
-            self.event_logger.addtext("ERROR: An error occurred during prediction: {}".format(str(e)))
+
+            ## ADDED
         
 
-        
+
+        return predicted_values
+
+
     
     def evaluate_polynomial_reg(self, percent, deg):
         Y = self.budgetReader.data[self.budgetReader.independent_var]
@@ -243,6 +294,22 @@ class dataAnalysis(object):
     #         total_contribution = sum(contributions.values())
     #         normalized_contributions = {col: (contribution / total_contribution) * budget for col, contribution in contributions.items()}
 
+    #         # Check if any contribution is negative and adjust it to zero
+    #         for col, allocation in normalized_contributions.items():
+    #             if allocation < 0:
+    #                 normalized_contributions[col] = 0
+
+    #         # Cap allocations to ensure they don't exceed the budget
+    #         total_allocated = sum(normalized_contributions.values())
+    #         if total_allocated > budget:
+    #             # Calculate the scaling factor to adjust allocations to fit within the budget
+    #             scaling_factor = budget / total_allocated
+    #             # Apply scaling factor to each allocation
+    #             normalized_contributions = {col: allocation * scaling_factor for col, allocation in normalized_contributions.items()}
+
+    #         # Recalculate total_contribution after adjusting allocations
+    #         total_contribution = sum(normalized_contributions.values())
+
     #         # Calculate the new predicted sales value
     #         new_predicted_sales = predicted_sales + total_contribution
 
@@ -271,59 +338,44 @@ class dataAnalysis(object):
 
     #     except Exception as e:
     #         self.event_logger.addtext("ERROR: An error occurred during recommendation: {}".format(str(e)))
-    
-    def recommend_changes_polynomial_reg(self, data_given: dict, deg, budget):
+        
+    def recommend_changes_polynomial_reg(self, budget, old, deg):
         try:
-            # Predict sales based on the provided independent variables
-            predicted_sales = self.predict_polynomial_reg(data_given, deg)
+            X = self.budgetReader.data.drop(columns=[self.budgetReader.independent_var])
+            y = self.budgetReader.data[self.budgetReader.independent_var]
+            allocation =  PolynomialRegressionOptimizer(X, y, budget, self.budgetReader.getDependentVar())
 
-            # Calculate the contributions of each independent variable to the predicted sales
-            contributions = {}
-            for col in data_given:
-                # Increment the value of the independent variable by a small amount
-                data_given_incremented = data_given.copy()
-                data_given_incremented[col] += 1  # Adjust the increment value as needed
-
-                # Ensure that the incremented value is non-negative
-                if data_given_incremented[col] < 0:
-                    data_given_incremented[col] = 0
-
-                # Predict sales with the incremented value of the independent variable
-                predicted_sales_incremented = self.predict_polynomial_reg(data_given_incremented, deg)
-
-                # Calculate the contribution of the variable
-                contribution = predicted_sales_incremented - predicted_sales
-                contributions[col] = contribution
-
-            # Normalize contributions to sum up to the budget
-            total_contribution = sum(contributions.values())
-            normalized_contributions = {col: (contribution / total_contribution) * budget for col, contribution in contributions.items()}
-
-            # Check if any contribution is negative and adjust it to zero
-            for col, allocation in normalized_contributions.items():
-                if allocation < 0:
-                    normalized_contributions[col] = 0
-
-            # Recalculate total_contribution after adjusting negative contributions
-            total_contribution = sum(normalized_contributions.values())
-
-            # Calculate the new predicted sales value
-            new_predicted_sales = predicted_sales + total_contribution
 
             # Log the recommendations
+            
+            
             self.data_logger.addtext("___________________________________________________________________")
             self.data_logger.addtext("")
             self.data_logger.addtext("Recommendations for Budget Allocation:")
             self.data_logger.addtext("")
 
-            for col, allocation in normalized_contributions.items():
-                self.data_logger.addtext(f"{col}: {allocation}")
+            
 
-            self.data_logger.addtext("This will give you a " + str(self.budgetReader.independent_var) + " value of : " + str(new_predicted_sales))
-            self.data_logger.addtext("Which is a " + str(total_contribution) + " increase from the previous value of " + str(predicted_sales))
+            new = {}
+            for col, amount in zip(self.budgetReader.getDependentVar(), allocation):
+                new[col] = amount
+            
+            sales = self.predict_polynomial_reg(new, deg)
 
-            # Calculate the percentage increase
-            percentage_increase = (total_contribution / predicted_sales) * 100
+            self.data_logger.addtext("")
+            self.data_logger.addtext("Allocation Amounts:")
+            self.data_logger.addtext("")
+
+            for col, amount in zip(self.budgetReader.getDependentVar(), allocation):
+                self.data_logger.addtext(f"{col}: {amount}")
+            
+            self.data_logger.addtext("")
+
+            self.data_logger.addtext("Sales value without recommendation: " + str(old))
+            self.data_logger.addtext("Sales value with new recommendation: " + str(sales))
+            self.data_logger.addtext("Sales increase: " + str(sales-old))
+            
+            percentage_increase = ((sales - old) / old) * 100
             # Convert percentage_increase to a scalar value if it's a numpy array
             percentage_increase_scalar = percentage_increase.item() if isinstance(percentage_increase, np.ndarray) else percentage_increase
             # Convert percentage_increase to a string with two decimal places
@@ -331,7 +383,6 @@ class dataAnalysis(object):
             # Log the percentage increase
             self.data_logger.addtext("Percentage Increase: " + percentage_increase_str)
 
-            return normalized_contributions
-
         except Exception as e:
             self.event_logger.addtext("ERROR: An error occurred during recommendation: {}".format(str(e)))
+
