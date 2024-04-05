@@ -233,8 +233,7 @@ class dataAnalysis(object):
 
 
             ## ADDED
-        budget = sum(data_given.values())
-        self.recommend_changes_polynomial_reg(X_train, y_train, budget, predicted_values)
+        
 
 
         return predicted_values
@@ -340,9 +339,13 @@ class dataAnalysis(object):
     #     except Exception as e:
     #         self.event_logger.addtext("ERROR: An error occurred during recommendation: {}".format(str(e)))
         
-    def recommend_changes_polynomial_reg(self, X, y, budget, old):
+    def recommend_changes_polynomial_reg(self, budget, old, deg):
         try:
-            allocation, sales = PolynomialRegressionOptimizer(X, y, budget, self.budgetReader.getDependentVar())
+            X = self.budgetReader.data.drop(columns=[self.budgetReader.independent_var])
+            y = self.budgetReader.data[self.budgetReader.independent_var]
+            allocation =  PolynomialRegressionOptimizer(X, y, budget, self.budgetReader.getDependentVar())
+
+
             # Log the recommendations
             
             
@@ -354,10 +357,19 @@ class dataAnalysis(object):
             
 
             new = {}
+            for col, amount in zip(self.budgetReader.getDependentVar(), allocation):
+                new[col] = amount
+            
+            sales = self.predict_polynomial_reg(new, deg)
+
+            self.data_logger.addtext("")
+            self.data_logger.addtext("Allocation Amounts:")
+            self.data_logger.addtext("")
 
             for col, amount in zip(self.budgetReader.getDependentVar(), allocation):
                 self.data_logger.addtext(f"{col}: {amount}")
-                new[col] = amount
+            
+            self.data_logger.addtext("")
 
             self.data_logger.addtext("Sales value without recommendation: " + str(old))
             self.data_logger.addtext("Sales value with new recommendation: " + str(sales))

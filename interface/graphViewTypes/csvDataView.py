@@ -260,6 +260,8 @@ class CsvDataView(object):
                 budget = sum(selected_vars.values())
                 # analyzeBudget.recommend_changes_polynomial_reg(budget, selected_vars, self.deg)
                 # analyzeBudget.polynomial_regression_optimization(budget, self.deg)
+                # budget = sum(data_given.values())
+                analyzeBudget.recommend_changes_polynomial_reg(budget, predicted_values, self.deg)
         popup = PopupWindow(self.canvas.get_tk_widget())
         popup.open_text_entry(text, variables, handle_done)
 
