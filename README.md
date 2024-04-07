@@ -10,8 +10,8 @@ Welcome to the Marketing Budget Tool! This tool is designed to optimize marketin
 - Interactive Visualization: The tool facilitates interactive data visualization, allowing users to explore trends and patterns within the dataset through detailed plots and graphs generated using libraries such as Matplotlib.
 - User-Friendly Interface: The tool features a user-friendly interface developed using the Flask web framework, providing a seamless and intuitive platform for users to interact with the system.
 
-![Image View 1](Github-images\Github1.png)
-![Image View 2](Github-images\Github2.png)
+![Image View 1](Github-images/Github1.png)
+![Image View 2](Github-images/Github2.png)
 
 ## Installation
 To use the Marketing Budget Tool, follow these steps:
